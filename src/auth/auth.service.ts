@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JwtService } from '@nestjs/jwt';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { registerEnumType } from '@nestjs/graphql';
 
@@ -46,23 +46,25 @@ export class AuthService {
    * @throws {ConflictException} If a user with the provided username or email already exists.
    */
   async signup(signUpInput: SignUpInput): Promise<SignResponse> {
+    await this.prisma.user
+      .findFirst({
+        where: {
+          OR: [
+            { username: signUpInput.username },
+            { connection: { email: signUpInput.email } },
+          ],
+        },
+      })
+      .then((user) => {
+        if (user)
+          throw new ConflictException(
+            'A user with this username or email already exists.',
+          );
+      });
+
     // Hash the password using argon2
     const hashedPassword: string = await argon.hash(signUpInput.password);
     console.log(hashedPassword);
-
-    return {
-      accessToken: 'accessToken',
-      refreshToken: 'refreshToken',
-      user: {
-        id: 1,
-        username: 'username',
-        profileComplete: false,
-        rank: 0,
-        status: Status.ONLINE,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    };
   }
 
   findAll() {

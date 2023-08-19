@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { IsDate, IsEmail, IsInt, IsNotEmpty } from 'class-validator';
 
 import { User } from 'src/user/entities/user.entity';
@@ -45,8 +45,9 @@ export class Connection {
   @IsEmail({}, { message: 'Email must be a valid email address' })
   @Field(() => String, {
     description: 'The email associated with the connection',
+    nullable: true,
   })
-  email: string;
+  email?: string;
 
   /**
    * The password associated with the connection.
@@ -55,8 +56,9 @@ export class Connection {
   @IsNotEmpty({ message: 'Password must not be empty' })
   @Field(() => String, {
     description: 'The password associated with the connection',
+    nullable: true,
   })
-  password: string;
+  password?: string;
 
   /**
    * One-time password associated with the connection.
@@ -65,8 +67,9 @@ export class Connection {
   @IsNotEmpty({ message: 'OTP must not be empty' })
   @Field(() => String, {
     description: 'One-time password associated with the connection',
+    nullable: true,
   })
-  otp: string;
+  otp?: string;
 
   /**
    * The intra_42 identifier associated with the connection.
@@ -74,10 +77,11 @@ export class Connection {
    */
   @IsNotEmpty({ message: 'Intra_42 must not be empty' })
   @IsInt({ message: 'Intra_42 must be an integer' })
-  @Field(() => Number, {
+  @Field(() => Int, {
     description: 'The intra_42 identifier associated with the connection',
+    nullable: true,
   })
-  intra_42: number;
+  intra_42?: number;
 
   /**
    * The date when the connection was created.
