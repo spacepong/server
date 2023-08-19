@@ -1,16 +1,36 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { AuthService } from './auth.service';
-import { Auth } from './entities/auth.entity';
-import { CreateAuthInput } from './dto/create-auth.input';
-import { UpdateAuthInput } from './dto/update-auth.input';
 
+import { Auth } from './entities/auth.entity';
+import { AuthService } from './auth.service';
+import { UpdateAuthInput } from './dto/update-auth.input';
+import { SignUpInput } from './dto/signup.input';
+import { SignResponse } from './dto/sign.response';
+
+/**
+ * Resolver class for handling GraphQL queries and mutations related to authentication.
+ *
+ * @export
+ * @class AuthResolver
+ */
 @Resolver(() => Auth)
 export class AuthResolver {
+  /**
+   * Creates an instance of the AuthResolver class.
+   *
+   * @param {AuthService} authService - The authentication service used for resolving authentication-related queries and mutations.
+   */
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => Auth)
-  createAuth(@Args('createAuthInput') createAuthInput: CreateAuthInput) {
-    return this.authService.create(createAuthInput);
+  /**
+   * Mutation to create a new user account by signing up.
+   *
+   * @param {SignUpInput} signUpInput - User signup input data.
+   * @returns {Promise<SignResponse>} - Sign-in response with tokens and user details.
+   */
+  @Mutation(() => SignResponse, { name: 'signup' })
+  signup(@Args('signUpInput') signUpInput: SignUpInput): Promise<SignResponse> {
+    // Call the authService's signup method to create a new user
+    return this.authService.signup(signUpInput);
   }
 
   @Query(() => [Auth], { name: 'auth' })

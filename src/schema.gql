@@ -7,14 +7,14 @@ type Auth {
   exampleField: Int!
 }
 
-input CreateAuthInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Mutation {
-  createAuth(createAuthInput: CreateAuthInput!): Auth!
   removeAuth(id: Int!): Auth!
+  signup(signUpInput: SignUpInput!): SignResponse!
   updateAuth(updateAuthInput: UpdateAuthInput!): Auth!
 }
 
@@ -22,8 +22,60 @@ type Query {
   auth(id: Int!): Auth!
 }
 
+type SignResponse {
+  """JSON Web Token (JWT) used for authorization and access"""
+  accessToken: String!
+
+  """Token for refreshing the JSON Web Token (JWT) when it expires"""
+  refreshToken: String!
+
+  """User entity containing user details"""
+  user: User!
+}
+
+input SignUpInput {
+  """The email address associated with the user's registration"""
+  email: String!
+
+  """The password chosen by the user for their account"""
+  password: String!
+
+  """The unique username chosen by the user for identification"""
+  username: String!
+}
+
+"""The status of the user"""
+enum Status {
+  AWAY
+  OFFLINE
+  ONLINE
+}
+
 input UpdateAuthInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
+}
+
+type User {
+  """Date the user was created"""
+  createdAt: DateTime!
+
+  """Unique identifier for the user"""
+  id: Int!
+
+  """Whether the user has completed their profile"""
+  profileComplete: Boolean!
+
+  """User rank"""
+  rank: Int!
+
+  """User status"""
+  status: Status!
+
+  """Date the user was last updated"""
+  updatedAt: DateTime!
+
+  """Username chosen by the user"""
+  username: String!
 }
