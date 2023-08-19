@@ -8,6 +8,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConnectionModule } from './connection/connection.module';
+import { AvatarModule } from './avatar/avatar.module';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -36,6 +37,9 @@ import { ConnectionModule } from './connection/connection.module';
 
     // Import ConnectionModule for connection-related features
     ConnectionModule,
+
+    // Import AvatarModule for avatar-related features
+    AvatarModule,
   ],
   controllers: [],
   providers: [

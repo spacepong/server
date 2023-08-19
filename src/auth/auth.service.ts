@@ -6,10 +6,11 @@ import { registerEnumType } from '@nestjs/graphql';
 
 import * as argon from 'argon2';
 
+import { Status } from 'src/user/enums/status.enum';
 import { SignUpInput } from './dto/signup.input';
 import { SignResponse } from './dto/sign.response';
 import { NewTokensResponse } from './dto/new-tokens.response';
-import { Status } from 'src/user/enums/status.enum';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 registerEnumType(Status, {
   name: 'Status',
@@ -27,10 +28,12 @@ export class AuthService {
   /**
    * Creates an instance of the AuthService class.
    *
+   * @param {PrismaService} prisma - The Prisma service for database interactions.
    * @param {ConfigService} configService - The configuration service for accessing application configuration.
    * @param {JwtService} JwtService - The JWT service for generating and verifying tokens.
    */
   constructor(
+    private prisma: PrismaService,
     private configService: ConfigService,
     private JwtService: JwtService,
   ) {}
