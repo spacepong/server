@@ -1,5 +1,11 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsDate, IsInt, IsBoolean, IsEmpty, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsInt,
+  IsBoolean,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
 
 import { Status } from '../enums/status.enum';
 
@@ -16,6 +22,7 @@ export class User {
    * The unique identifier for the user.
    * @type {number}
    */
+  @IsNotEmpty({ message: 'User ID must not be empty' })
   @IsInt({ message: 'User ID must be an integer' })
   @Field(() => Int, { description: 'Unique identifier for the user' })
   id: number;
@@ -24,7 +31,7 @@ export class User {
    * The username chosen by the user for identification.
    * @type {string}
    */
-  @IsEmpty({ message: 'Username must not be empty' })
+  @IsNotEmpty({ message: 'Username must not be empty' })
   @IsString({ message: 'Username must be a string' })
   @Field(() => String, { description: 'Username chosen by the user' })
   username: string;
@@ -33,6 +40,7 @@ export class User {
    * Whether the user has completed their profile.
    * @type {boolean}
    */
+  @IsNotEmpty({ message: 'Profile completion status must not be empty' })
   @IsBoolean({ message: 'Profile completion status must be a boolean' })
   @Field(() => Boolean, {
     description: 'Whether the user has completed their profile',
@@ -43,6 +51,7 @@ export class User {
    * The rank of the user.
    * @type {number}
    */
+  @IsNotEmpty({ message: 'User rank must not be empty' })
   @IsInt({ message: 'User rank must be an integer' })
   @Field(() => Int, { description: 'User rank' })
   rank: number;
@@ -51,6 +60,7 @@ export class User {
    * The status of the user.
    * @type {Status}
    */
+  @IsNotEmpty({ message: 'User status must not be empty' })
   @Field(() => Status, { description: 'User status' })
   status: Status;
 
@@ -58,6 +68,7 @@ export class User {
    * The date the user account was created.
    * @type {Date}
    */
+  @IsNotEmpty({ message: 'User created at must not be empty' })
   @IsDate({ message: 'User created at must be a date' })
   @Field(() => Date, { description: 'Date the user was created' })
   createdAt: Date;
