@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 
 import { PrismaService } from './prisma/prisma.service';
+import { AuthModule } from './auth/auth.module';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -20,6 +21,9 @@ import { PrismaService } from './prisma/prisma.service';
       sortSchema: true, // Sort schema alphabetically
       includeStacktraceInErrorResponses: false, // Disable stacktraces
     }),
+
+    // Import AuthModule for authentication related features
+    AuthModule,
   ],
   controllers: [],
   providers: [
