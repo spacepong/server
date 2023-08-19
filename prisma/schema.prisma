@@ -28,38 +28,46 @@ model User {
     status           Status      @default(OFFLINE)
     won              Match[]     @relation("UserWonMatch")
     lost             Match[]     @relation("UserLostMatch")
+    createdAt        DateTime    @default(now())
+    updatedAt        DateTime    @updatedAt
 
     @@map("users")
 }
 
 model Match {
-    id       Int      @id @default(autoincrement())
+    id        Int      @id @default(autoincrement())
     // score    Int[]    @db.IntegerArray
-    date     DateTime
-    winner   User     @relation("UserWonMatch", fields: [winnerId], references: [id])
-    winnerId Int      @unique
-    loser    User     @relation("UserLostMatch", fields: [loserId], references: [id])
-    loserId  Int      @unique
+    date      DateTime
+    winner    User     @relation("UserWonMatch", fields: [winnerId], references: [id])
+    winnerId  Int      @unique
+    loser     User     @relation("UserLostMatch", fields: [loserId], references: [id])
+    loserId   Int      @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@map("matches")
 }
 
 model Connection {
-    id       Int     @id @default(autoincrement())
-    user     User    @relation(fields: [userId], references: [id])
-    userId   Int     @unique
-    otp      String?
-    field_42 Int?
+    id        Int      @id @default(autoincrement())
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int      @unique
+    otp       String?
+    field_42  Int?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@map("connections")
 }
 
 model Avatar {
-    id       Int    @id @default(autoincrement())
-    filename String
-    data     Bytes
-    user     User   @relation(fields: [userId], references: [id])
-    userId   Int    @unique
+    id        Int      @id @default(autoincrement())
+    filename  String
+    data      Bytes
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int      @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@map("avatars")
 }
