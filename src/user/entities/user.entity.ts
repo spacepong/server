@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 
 import { Status } from '../enums/status.enum';
+import { Connection } from 'src/connection/entities/connection.entity';
 
 /**
  * Represents an individual user within the system.
@@ -26,6 +27,14 @@ export class User {
   @IsInt({ message: 'User ID must be an integer' })
   @Field(() => Int, { description: 'Unique identifier for the user' })
   id: number;
+
+  /**
+   * The associated connection entity.
+   * @type {Connection}
+   */
+  @IsNotEmpty({ message: 'Connection must not be empty' })
+  @Field(() => Connection, { description: 'The associated connection entity' })
+  connection: Connection;
 
   /**
    * The username chosen by the user for identification.
