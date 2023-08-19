@@ -5,7 +5,7 @@ CREATE TYPE "Status" AS ENUM ('ONLINE', 'OFFLINE', 'AWAY');
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "username" VARCHAR(8),
-    "profileCompleted" BOOLEAN NOT NULL DEFAULT false,
+    "profileComplete" BOOLEAN NOT NULL DEFAULT false,
     "rank" INTEGER NOT NULL DEFAULT 100,
     "status" "Status" NOT NULL DEFAULT 'OFFLINE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -30,6 +30,7 @@ CREATE TABLE "matches" (
 CREATE TABLE "connections" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
+    "email" TEXT,
     "password" TEXT,
     "refreshToken" TEXT,
     "otp" TEXT,
@@ -63,6 +64,9 @@ CREATE UNIQUE INDEX "matches_loserId_key" ON "matches"("loserId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "connections_userId_key" ON "connections"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "connections_email_key" ON "connections"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "avatars_userId_key" ON "avatars"("userId");

@@ -17,19 +17,19 @@ enum Status {
 }
 
 model User {
-    id               Int         @id @default(autoincrement())
-    connection       Connection?
-    avatar           Avatar?
-    username         String?     @unique @db.VarChar(8)
-    profileCompleted Boolean     @default(false)
-    rank             Int         @default(100)
+    id              Int         @id @default(autoincrement())
+    connection      Connection?
+    avatar          Avatar?
+    username        String?     @unique @db.VarChar(8)
+    profileComplete Boolean     @default(false)
+    rank            Int         @default(100)
     // followed         Int[]       @db.IntegerArray
     // blocked          Int[]       @db.IntegerArray
-    status           Status      @default(OFFLINE)
-    won              Match[]     @relation("UserWonMatch")
-    lost             Match[]     @relation("UserLostMatch")
-    createdAt        DateTime    @default(now())
-    updatedAt        DateTime    @updatedAt
+    status          Status      @default(OFFLINE)
+    won             Match[]     @relation("UserWonMatch")
+    lost            Match[]     @relation("UserLostMatch")
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
 
     @@map("users")
 }
@@ -52,6 +52,7 @@ model Connection {
     id           Int      @id @default(autoincrement())
     user         User     @relation(fields: [userId], references: [id])
     userId       Int      @unique
+    email        String?  @unique
     password     String?
     refreshToken String?
     otp          String?

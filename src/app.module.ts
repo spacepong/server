@@ -5,6 +5,7 @@ import { join } from 'path';
 
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -24,6 +25,9 @@ import { AuthModule } from './auth/auth.module';
 
     // Import AuthModule for authentication related features
     AuthModule,
+
+    // Import UserModule for user-related features
+    UserModule,
   ],
   controllers: [],
   providers: [
