@@ -6,7 +6,6 @@ import { registerEnumType } from '@nestjs/graphql';
 
 import * as argon from 'argon2';
 
-import { UpdateAuthInput } from './dto/update-auth.input';
 import { SignUpInput } from './dto/signup.input';
 import { SignResponse } from './dto/sign.response';
 import { NewTokensResponse } from './dto/new-tokens.response';
@@ -29,6 +28,7 @@ export class AuthService {
    * Creates an instance of the AuthService class.
    *
    * @param {ConfigService} configService - The configuration service for accessing application configuration.
+   * @param {JwtService} JwtService - The JWT service for generating and verifying tokens.
    */
   constructor(
     private configService: ConfigService,
@@ -70,8 +70,7 @@ export class AuthService {
     return `This action returns a #${id} auth`;
   }
 
-  update(id: number, updateAuthInput: UpdateAuthInput) {
-    updateAuthInput;
+  update(id: number) {
     return `This action updates a #${id} auth`;
   }
 

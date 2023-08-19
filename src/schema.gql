@@ -15,7 +15,7 @@ scalar DateTime
 type Mutation {
   removeAuth(id: Int!): Auth!
   signup(signUpInput: SignUpInput!): SignResponse!
-  updateAuth(updateAuthInput: UpdateAuthInput!): Auth!
+  updateAuth(id: Int!): Auth!
 }
 
 type Query {
@@ -49,12 +49,6 @@ enum Status {
   AWAY
   OFFLINE
   ONLINE
-}
-
-input UpdateAuthInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
 
 type User {
