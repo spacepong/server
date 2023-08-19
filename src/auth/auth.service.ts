@@ -1,9 +1,13 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { registerEnumType } from '@nestjs/graphql';
 
 import { UpdateAuthInput } from './dto/update-auth.input';
 import { SignUpInput } from './dto/signup.input';
 import { SignResponse } from './dto/sign.response';
+import { NewTokensResponse } from './dto/new-tokens.response';
 import { Status } from 'src/user/enums/status.enum';
 
 registerEnumType(Status, {
@@ -21,8 +25,13 @@ registerEnumType(Status, {
 export class AuthService {
   /**
    * Creates an instance of the AuthService class.
+   *
+   * @param {ConfigService} configService - The configuration service for accessing application configuration.
    */
-  constructor() {}
+  constructor(
+    private configService: ConfigService,
+    private JwtService: JwtService,
+  ) {}
 
   /**
    * Creates a new user account through the signup process.
@@ -63,5 +72,38 @@ export class AuthService {
 
   remove(id: number) {
     return `This action removes a #${id} auth`;
+  }
+
+  /**
+   * Creates access and refresh tokens for the provided user ID and email.
+   *
+   * @param {number} userId - User ID.
+   * @param {string} email - User's email.
+   * @returns {Promise<NewTokensResponse>} - Access and refresh tokens.
+   */
+  async createTokens(
+    userId: number,
+    email: string,
+  ): Promise<NewTokensResponse> {
+    // Generate an access token
+    const accessToken: string = this.JwtService.sign(
+      { userId, email },
+      {
+        expiresIn: this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
+        secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+      },
+    );
+
+    // Generate a refresh token tied to the access token
+    const refreshToken: string = this.JwtService.sign(
+      { userId, email, accessToken },
+      {
+        expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
+        secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      },
+    );
+
+    // Return both tokens
+    return { accessToken, refreshToken };
   }
 }
