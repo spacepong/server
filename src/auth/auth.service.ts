@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { registerEnumType } from '@nestjs/graphql';
 
+import * as argon from 'argon2';
+
 import { UpdateAuthInput } from './dto/update-auth.input';
 import { SignUpInput } from './dto/signup.input';
 import { SignResponse } from './dto/sign.response';
@@ -41,7 +43,10 @@ export class AuthService {
    * @throws {ConflictException} If a user with the provided username or email already exists.
    */
   async signup(signUpInput: SignUpInput): Promise<SignResponse> {
-    signUpInput;
+    // Hash the password using argon2
+    const hashedPassword: string = await argon.hash(signUpInput.password);
+    console.log(hashedPassword);
+
     return {
       accessToken: 'accessToken',
       refreshToken: 'refreshToken',
@@ -105,5 +110,21 @@ export class AuthService {
 
     // Return both tokens
     return { accessToken, refreshToken };
+  }
+
+  /**
+   * Updates the refresh token for the provided user ID.
+   *
+   * @param {number} userId - User ID.
+   * @param {string} refreshToken - New refresh token.
+   * @returns {Promise<void>}
+   */
+  async updateRefreshToken(
+    userId: number,
+    refreshToken: string,
+  ): Promise<void> {
+    // Hash the new refresh token using argon2
+    const hashedRefreshToken: string = await argon.hash(refreshToken);
+    console.log(hashedRefreshToken);
   }
 }
