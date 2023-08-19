@@ -23,8 +23,8 @@ model User {
     username         String?     @unique @db.VarChar(8)
     profileCompleted Boolean     @default(false)
     rank             Int         @default(100)
-    followed         Int[]       @db.IntegerArray
-    blocked          Int[]       @db.IntegerArray
+    // followed         Int[]       @db.IntegerArray
+    // blocked          Int[]       @db.IntegerArray
     status           Status      @default(OFFLINE)
     won              Match[]     @relation("UserWonMatch")
     lost             Match[]     @relation("UserLostMatch")
@@ -34,12 +34,12 @@ model User {
 
 model Match {
     id       Int      @id @default(autoincrement())
-    score    Int[]    @db.IntegerArray
+    // score    Int[]    @db.IntegerArray
     date     DateTime
     winner   User     @relation("UserWonMatch", fields: [winnerId], references: [id])
-    winnerId Int
+    winnerId Int      @unique
     loser    User     @relation("UserLostMatch", fields: [loserId], references: [id])
-    loserId  Int
+    loserId  Int      @unique
 
     @@map("matches")
 }
@@ -47,7 +47,7 @@ model Match {
 model Connection {
     id       Int     @id @default(autoincrement())
     user     User    @relation(fields: [userId], references: [id])
-    userId   Int @unique
+    userId   Int     @unique
     otp      String?
     field_42 Int?
 
@@ -59,7 +59,7 @@ model Avatar {
     filename String
     data     Bytes
     user     User   @relation(fields: [userId], references: [id])
-    userId   Int
+    userId   Int    @unique
 
     @@map("avatars")
 }
