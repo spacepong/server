@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 
+import { PrismaService } from './prisma/prisma.service';
+
 /**
  * Main application module that configures and initializes various modules.
  *
@@ -20,6 +22,8 @@ import { join } from 'path';
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    PrismaService, // Provide Prisma service throughout the application
+  ],
 })
 export class AppModule {}
