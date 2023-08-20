@@ -17,60 +17,67 @@ enum Status {
 }
 
 model User {
-    id              Int         @id @default(autoincrement())
+    id              String      @id @default(uuid())
     connection      Connection?
     avatar          Avatar?
     username        String?     @unique @db.VarChar(8)
     profileComplete Boolean     @default(false)
     rank            Int         @default(100)
-    // followed         Int[]       @db.IntegerArray
-    // blocked          Int[]       @db.IntegerArray
-    status          Status      @default(OFFLINE)
-    won             Match[]     @relation("UserWonMatch")
-    lost            Match[]     @relation("UserLostMatch")
-    createdAt       DateTime    @default(now())
-    updatedAt       DateTime    @updatedAt
+    followed        String[]
+    blocked         String[]
+    status          Status      @default(ONLINE)
+    won             Match[]     @relation("WonMatch")
+    lost            Match[]     @relation("LostMatch")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@map("users")
 }
 
 model Match {
-    id        Int      @id @default(autoincrement())
-    // score    Int[]    @db.IntegerArray
-    date      DateTime
-    winner    User     @relation("UserWonMatch", fields: [winnerId], references: [id])
-    winnerId  Int      @unique
-    loser     User     @relation("UserLostMatch", fields: [loserId], references: [id])
-    loserId   Int      @unique
+    id       String   @id @default(uuid())
+    score    Int[]    @default([0, 0])
+    winnerId String   @unique
+    loserId  String   @unique
+    date     DateTime
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    winner User @relation("WonMatch", fields: [winnerId], references: [id])
+    loser  User @relation("LostMatch", fields: [loserId], references: [id])
 
     @@map("matches")
 }
 
 model Connection {
-    id           Int      @id @default(autoincrement())
-    user         User     @relation(fields: [userId], references: [id])
-    userId       Int      @unique
-    email        String?  @unique
+    id           String  @id @default(uuid())
+    userId       String  @unique
+    email        String? @unique
     password     String?
     refreshToken String?
     otp          String?
-    intra_42     Int?
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
+    intra_42     Int?    @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id])
 
     @@map("connections")
 }
 
 model Avatar {
-    id        Int      @id @default(autoincrement())
-    filename  String
-    data      Bytes
-    user      User     @relation(fields: [userId], references: [id])
-    userId    Int      @unique
+    id       String @id @default(uuid())
+    userId   String @unique
+    filename String
+    data     Bytes
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id])
 
     @@map("avatars")
 }

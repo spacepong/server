@@ -7,6 +7,35 @@ type Auth {
   exampleField: Int!
 }
 
+type Connection {
+  """The date when the connection was created"""
+  createdAt: DateTime!
+
+  """The email associated with the connection"""
+  email: String
+
+  """Unique identifier for the connection"""
+  id: String!
+
+  """The intra_42 identifier associated with the connection"""
+  intra_42: Int
+
+  """One-time password associated with the connection"""
+  otp: String
+
+  """The password associated with the connection"""
+  password: String
+
+  """The date when the connection was last updated"""
+  updatedAt: DateTime!
+
+  """The associated user entity"""
+  user: User!
+
+  """The ID of the associated user"""
+  userId: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -52,11 +81,14 @@ enum Status {
 }
 
 type User {
+  """The associated connection entity"""
+  connection: Connection
+
   """Date the user was created"""
   createdAt: DateTime!
 
   """Unique identifier for the user"""
-  id: Int!
+  id: String!
 
   """Whether the user has completed their profile"""
   profileComplete: Boolean!

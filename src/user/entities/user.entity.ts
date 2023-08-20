@@ -21,20 +21,22 @@ import { Connection } from 'src/connection/entities/connection.entity';
 export class User {
   /**
    * The unique identifier for the user.
-   * @type {number}
+   * @type {string}
    */
   @IsNotEmpty({ message: 'User ID must not be empty' })
-  @IsInt({ message: 'User ID must be an integer' })
-  @Field(() => Int, { description: 'Unique identifier for the user' })
-  id: number;
+  @Field(() => String, { description: 'Unique identifier for the user' })
+  id: string;
 
   /**
    * The associated connection entity.
    * @type {Connection}
    */
   @IsNotEmpty({ message: 'Connection must not be empty' })
-  @Field(() => Connection, { description: 'The associated connection entity' })
-  connection: Connection;
+  @Field(() => Connection, {
+    description: 'The associated connection entity',
+    nullable: true,
+  })
+  connection?: Connection;
 
   /**
    * The username chosen by the user for identification.

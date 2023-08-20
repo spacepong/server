@@ -13,12 +13,12 @@ import { User } from 'src/user/entities/user.entity';
 export class Connection {
   /**
    * The unique identifier for the connection.
-   * @type {number}
+   * @type {string}
    */
   @IsNotEmpty({ message: 'Connection ID must not be empty' })
   @IsInt({ message: 'Connection ID must be an integer' })
-  @Field(() => Number, { description: 'Unique identifier for the connection' })
-  id: number;
+  @Field(() => String, { description: 'Unique identifier for the connection' })
+  id: string;
 
   /**
    * The associated user entity.
@@ -30,12 +30,12 @@ export class Connection {
 
   /**
    * The ID of the associated user.
-   * @type {number}
+   * @type {string}
    */
   @IsNotEmpty({ message: 'User ID must not be empty' })
   @IsInt({ message: 'User ID must be an integer' })
-  @Field(() => Number, { description: 'The ID of the associated user' })
-  userId: number;
+  @Field(() => String, { description: 'The ID of the associated user' })
+  userId: string;
 
   /**
    * The email associated with the connection.

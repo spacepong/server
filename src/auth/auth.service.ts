@@ -11,6 +11,7 @@ import { SignUpInput } from './dto/signup.input';
 import { SignResponse } from './dto/sign.response';
 import { NewTokensResponse } from './dto/new-tokens.response';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ConnectionService } from 'src/connection/connection.service';
 
 registerEnumType(Status, {
   name: 'Status',
@@ -36,6 +37,7 @@ export class AuthService {
     private prisma: PrismaService,
     private configService: ConfigService,
     private JwtService: JwtService,
+    private connectionService: ConnectionService,
   ) {}
 
   /**
@@ -61,10 +63,19 @@ export class AuthService {
             'A user with this username or email already exists.',
           );
       });
-
-    // Hash the password using argon2
-    const hashedPassword: string = await argon.hash(signUpInput.password);
-    console.log(hashedPassword);
+    return {
+      accessToken: 'accessToken',
+      refreshToken: 'refreshToken',
+      user: {
+        id: 'id',
+        username: '',
+        profileComplete: false,
+        rank: 0,
+        status: Status.ONLINE,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    };
   }
 
   findAll() {
