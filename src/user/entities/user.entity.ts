@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 
-import { Status } from '../enums/status.enum';
+import { Avatar } from 'src/avatar/entities/avatar.entity';
 import { Connection } from 'src/connection/entities/connection.entity';
 
 /**
@@ -39,13 +39,27 @@ export class User {
   connection?: Connection;
 
   /**
+   * The associated avatar entity.
+   * @type {Avatar}
+   */
+  @IsNotEmpty({ message: 'Avatar must not be empty' })
+  @Field(() => Avatar, {
+    description: 'The associated avatar entity',
+    nullable: true,
+  })
+  avatar?: Avatar;
+
+  /**
    * The username chosen by the user for identification.
    * @type {string}
    */
   @IsNotEmpty({ message: 'Username must not be empty' })
   @IsString({ message: 'Username must be a string' })
-  @Field(() => String, { description: 'Username chosen by the user' })
-  username: string;
+  @Field(() => String, {
+    description: 'Username chosen by the user',
+    nullable: true,
+  })
+  username?: string;
 
   /**
    * Whether the user has completed their profile.
@@ -69,11 +83,11 @@ export class User {
 
   /**
    * The status of the user.
-   * @type {Status}
+   * @type {string}
    */
   @IsNotEmpty({ message: 'User status must not be empty' })
-  @Field(() => Status, { description: 'User status' })
-  status: Status;
+  @Field(() => String, { description: 'User status' })
+  status: string;
 
   /**
    * The date the user account was created.

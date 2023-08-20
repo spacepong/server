@@ -1,7 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { IsDate, IsInt, IsNotEmpty } from 'class-validator';
-
-import { User } from 'src/user/entities/user.entity';
+import { IsDate, IsNotEmpty } from 'class-validator';
 
 /**
  * Represents an avatar entity that stores user's avatar-related data.
@@ -13,12 +11,11 @@ import { User } from 'src/user/entities/user.entity';
 export class Avatar {
   /**
    * The unique identifier for the avatar.
-   * @type {number}
+   * @type {string}
    */
   @IsNotEmpty({ message: 'Avatar ID must not be empty' })
-  @IsInt({ message: 'Avatar ID must be an integer' })
-  @Field(() => Number, { description: 'Unique identifier for the avatar' })
-  id: number;
+  @Field(() => String, { description: 'Unique identifier for the avatar' })
+  id: string;
 
   /**
    * The filename of the avatar.
@@ -29,28 +26,12 @@ export class Avatar {
   filename: string;
 
   /**
-   * The binary data of the avatar.
-   * @type {Buffer}
-   */
-  @IsNotEmpty({ message: 'Avatar data must not be empty' })
-  data: Buffer;
-
-  /**
-   * The associated user entity.
-   * @type {User}
-   */
-  @IsNotEmpty({ message: 'User must not be empty' })
-  @Field(() => User, { description: 'The associated user entity' })
-  user: User;
-
-  /**
    * The ID of the associated user.
-   * @type {number}
+   * @type {string}
    */
   @IsNotEmpty({ message: 'User ID must not be empty' })
-  @IsInt({ message: 'User ID must be an integer' })
-  @Field(() => Number, { description: 'The ID of the associated user' })
-  userId: number;
+  @Field(() => String, { description: 'The ID of the associated user' })
+  userId: string;
 
   /**
    * The date when the avatar was created.

@@ -1,8 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { IsDate, IsEmail, IsInt, IsNotEmpty } from 'class-validator';
 
-import { User } from 'src/user/entities/user.entity';
-
 /**
  * Represents a connection entity that stores user-related data.
  *
@@ -16,24 +14,14 @@ export class Connection {
    * @type {string}
    */
   @IsNotEmpty({ message: 'Connection ID must not be empty' })
-  @IsInt({ message: 'Connection ID must be an integer' })
   @Field(() => String, { description: 'Unique identifier for the connection' })
   id: string;
-
-  /**
-   * The associated user entity.
-   * @type {User}
-   */
-  @IsNotEmpty({ message: 'User must not be empty' })
-  @Field(() => User, { description: 'The associated user entity' })
-  user: User;
 
   /**
    * The ID of the associated user.
    * @type {string}
    */
   @IsNotEmpty({ message: 'User ID must not be empty' })
-  @IsInt({ message: 'User ID must be an integer' })
   @Field(() => String, { description: 'The ID of the associated user' })
   userId: string;
 

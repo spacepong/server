@@ -63,18 +63,33 @@ export class AuthService {
             'A user with this username or email already exists.',
           );
       });
-    return {
-      accessToken: 'accessToken',
-      refreshToken: 'refreshToken',
-      user: {
-        id: 'id',
-        username: '',
-        profileComplete: false,
-        rank: 0,
-        status: Status.ONLINE,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+
+    const user = await this.prisma.user.create({
+      data: {
+        avatar: {
+          create: {
+            filename: 'default.png',
+          },
+        },
+        connection: {
+          create: {
+            intra_42: 70,
+          },
+        },
+        username: signUpInput.username,
       },
+      include: {
+        lost: true,
+        won: true,
+        avatar: true,
+        connection: true,
+      },
+    });
+
+    return {
+      user,
+      accessToken: '',
+      refreshToken: '',
     };
   }
 

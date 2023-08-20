@@ -7,6 +7,23 @@ type Auth {
   exampleField: Int!
 }
 
+type Avatar {
+  """The date when the avatar was created"""
+  createdAt: DateTime!
+
+  """Filename of the avatar"""
+  filename: String!
+
+  """Unique identifier for the avatar"""
+  id: String!
+
+  """The date when the avatar was last updated"""
+  updatedAt: DateTime!
+
+  """The ID of the associated user"""
+  userId: String!
+}
+
 type Connection {
   """The date when the connection was created"""
   createdAt: DateTime!
@@ -28,9 +45,6 @@ type Connection {
 
   """The date when the connection was last updated"""
   updatedAt: DateTime!
-
-  """The associated user entity"""
-  user: User!
 
   """The ID of the associated user"""
   userId: String!
@@ -73,14 +87,10 @@ input SignUpInput {
   username: String!
 }
 
-"""The status of the user"""
-enum Status {
-  AWAY
-  OFFLINE
-  ONLINE
-}
-
 type User {
+  """The associated avatar entity"""
+  avatar: Avatar
+
   """The associated connection entity"""
   connection: Connection
 
@@ -97,11 +107,11 @@ type User {
   rank: Int!
 
   """User status"""
-  status: Status!
+  status: String!
 
   """Date the user was last updated"""
   updatedAt: DateTime!
 
   """Username chosen by the user"""
-  username: String!
+  username: String
 }

@@ -10,22 +10,16 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-enum Status {
-    ONLINE
-    OFFLINE
-    AWAY
-}
-
 model User {
     id              String      @id @default(uuid())
     connection      Connection?
     avatar          Avatar?
-    username        String?     @unique @db.VarChar(8)
+    username        String?     @unique
     profileComplete Boolean     @default(false)
     rank            Int         @default(100)
-    followed        String[]
-    blocked         String[]
-    status          Status      @default(ONLINE)
+    followed        String[]    @default([])
+    blocked         String[]    @default([])
+    status          String      @default("ONLINE")
     won             Match[]     @relation("WonMatch")
     lost            Match[]     @relation("LostMatch")
 
@@ -72,7 +66,6 @@ model Avatar {
     id       String @id @default(uuid())
     userId   String @unique
     filename String
-    data     Bytes
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
