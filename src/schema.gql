@@ -57,6 +57,7 @@ scalar DateTime
 
 type Mutation {
   removeAuth(id: Int!): Auth!
+  signin: String!
   signup(signUpInput: SignUpInput!): SignResponse!
   updateAuth(id: Int!): Auth!
 }

@@ -2,21 +2,17 @@
 import { JwtService } from '@nestjs/jwt';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { registerEnumType } from '@nestjs/graphql';
 
 import * as argon from 'argon2';
 
-import { Status } from 'src/user/enums/status.enum';
 import { SignUpInput } from './dto/signup.input';
 import { SignResponse } from './dto/sign.response';
 import { NewTokensResponse } from './dto/new-tokens.response';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConnectionService } from 'src/connection/connection.service';
-
-registerEnumType(Status, {
-  name: 'Status',
-  description: 'The status of the user',
-});
+import { Connection } from 'src/connection/entities/connection.entity';
+import { Public } from './decorators/public.decorator';
+import { Mutation } from '@nestjs/graphql';
 
 /**
  * Service responsible for authentication-related functionality.
@@ -47,6 +43,8 @@ export class AuthService {
    * @returns {Promise<SignResponse>} - Access and refresh tokens and user data.
    * @throws {ConflictException} If a user with the provided username or email already exists.
    */
+  @Public()
+  @Mutation(() => SignResponse, { name: 'signup' })
   async signup(signUpInput: SignUpInput): Promise<SignResponse> {
     await this.prisma.user
       .findFirst({
@@ -91,6 +89,41 @@ export class AuthService {
       accessToken: '',
       refreshToken: '',
     };
+  }
+
+  @Public()
+  @Mutation(() => String, { name: 'signin' })
+  async signin(signInInput: any): Promise<string> {
+    const connection: Connection =
+      await this.connectionService.findConnectionByUserId(signInInput._json.id);
+    if (!connection) {
+      if (!connection) {
+        const user = await this.prisma.user.create({
+          data: {
+            avatar: {
+              create: {
+                filename: signInInput._json.image.link,
+              },
+            },
+            connection: {
+              create: {
+                intra_42: signInInput._json.id,
+                email: signInInput._json.email,
+              },
+            },
+            username: signInInput.username,
+          },
+          include: {
+            lost: true,
+            won: true,
+            avatar: true,
+            connection: true,
+          },
+        });
+        console.log(user);
+      }
+    }
+    return '';
   }
 
   findAll() {

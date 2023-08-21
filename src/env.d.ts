@@ -3,6 +3,7 @@ declare global {
     interface ProcessEnv {
       PORT: string;
       DATABASE_URL: string;
+      FRONTEND_URL: string;
       JWT_ACCESS_TOKEN_EXPIRATION_TIME: string;
       JWT_REFRESH_TOKEN_EXPIRATION_TIME: string;
       JWT_ACCESS_TOKEN_SECRET: string;

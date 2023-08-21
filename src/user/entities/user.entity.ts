@@ -69,6 +69,7 @@ export class User {
   @IsBoolean({ message: 'Profile completion status must be a boolean' })
   @Field(() => Boolean, {
     description: 'Whether the user has completed their profile',
+    defaultValue: false,
   })
   profileComplete: boolean;
 
@@ -78,7 +79,7 @@ export class User {
    */
   @IsNotEmpty({ message: 'User rank must not be empty' })
   @IsInt({ message: 'User rank must be an integer' })
-  @Field(() => Int, { description: 'User rank' })
+  @Field(() => Int, { description: 'User rank', defaultValue: 100 })
   rank: number;
 
   /**
@@ -86,7 +87,7 @@ export class User {
    * @type {string}
    */
   @IsNotEmpty({ message: 'User status must not be empty' })
-  @Field(() => String, { description: 'User status' })
+  @Field(() => String, { description: 'User status', defaultValue: 'ONLINE' })
   status: string;
 
   /**

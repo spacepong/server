@@ -1,16 +1,23 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
+
+import { AuthService } from 'src/auth/auth.service';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { Intra42Guard } from 'src/auth/guards/intra42.guard';
 
 @Controller('app')
 export class AppController {
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Public()
   @UseGuards(Intra42Guard)
   @Get('/callback')
-  intraCallback(@Query('code') code: string) {
-    console.log(code);
-    return 'Hello World!';
+  async intraCallback(@Req() req: any, @Res() res: Response): Promise<void> {
+    await this.authService.signin(req.user);
+    res.redirect(this.configService.get<string>('FRONTEND_URL'));
   }
 }

@@ -2,6 +2,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { join } from 'path';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,6 +11,8 @@ import { UserModule } from '../user/user.module';
 import { ConnectionModule } from '../connection/connection.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { AppController } from './app.controller';
+import { AuthService } from 'src/auth/auth.service';
+import { ConnectionService } from 'src/connection/connection.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -47,6 +50,9 @@ import { AppController } from './app.controller';
   ],
   providers: [
     PrismaService, // Provide Prisma service throughout the application
+    AuthService, // Provide Auth service throughout the application
+    JwtService, // Provide JWT service throughout the application
+    ConnectionService, // Provide Connection service throughout the application
   ],
 })
 export class AppModule {}

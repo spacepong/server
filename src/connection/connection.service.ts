@@ -19,4 +19,21 @@ export class ConnectionService {
       },
     });
   }
+
+  /**
+   * Finds a connection by the user's 42 intra ID.
+   * @param intra_42 The user's 42 intra ID.
+   * @returns The connection.
+   */
+  async findConnectionByUserId(intra_42: number) {
+    try {
+      return this.prisma.connection.findFirst({
+        where: {
+          intra_42,
+        },
+      });
+    } catch (e) {
+      return null;
+    }
+  }
 }
