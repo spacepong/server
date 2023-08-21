@@ -4,11 +4,12 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 
-import { PrismaService } from './prisma/prisma.service';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { ConnectionModule } from './connection/connection.module';
-import { AvatarModule } from './avatar/avatar.module';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
+import { ConnectionModule } from '../connection/connection.module';
+import { AvatarModule } from '../avatar/avatar.module';
+import { AppController } from './app.controller';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -41,7 +42,9 @@ import { AvatarModule } from './avatar/avatar.module';
     // Import AvatarModule for avatar-related features
     AvatarModule,
   ],
-  controllers: [],
+  controllers: [
+    AppController, // Provide AppController throughout the application
+  ],
   providers: [
     PrismaService, // Provide Prisma service throughout the application
   ],
