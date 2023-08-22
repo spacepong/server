@@ -24,22 +24,37 @@ export class SignResponse {
   accessToken: string;
 
   /**
-   * A token for refreshing the JSON Web Token (JWT) when it expires.
+   * A JSON Web Token (JWT) used for authorization and access to intra42 API.
    * @type {string}
    */
-  @IsNotEmpty({ message: 'Refresh token is required' })
-  @IsString({ message: 'Refresh token must be a string' })
+  @IsNotEmpty({ message: 'Intra42 access token is required' })
+  @IsString({ message: 'Intra42 access token must be a string' })
   @Field(() => String, {
     description:
-      'Token for refreshing the JSON Web Token (JWT) when it expires',
+      'JSON Web Token (JWT) used for authorization and access to intra42 API',
   })
-  refreshToken: string;
+  intra42AccessToken: string;
+
+  /**
+   * A token for refreshing the intra42 API JSON Web Token (JWT) when it expires.
+   * @type {string}
+   */
+  @IsNotEmpty({ message: 'Intra42 refresh token is required' })
+  @IsString({ message: 'Intra42 refresh token must be a string' })
+  @Field(() => String, {
+    description:
+      'A token for refreshing the intra42 API JSON Web Token (JWT) when it expires',
+  })
+  intra42RefreshToken: string;
 
   /**
    * The user entity containing information about the signed-in user.
    * @type {User}
    */
   @IsNotEmpty({ message: 'User is required' })
-  @Field(() => User, { description: 'User entity containing user details' })
-  user: User;
+  @Field(() => User, {
+    description: 'User entity containing user details',
+    nullable: true,
+  })
+  user: User | null;
 }

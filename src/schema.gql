@@ -7,112 +7,11 @@ type Auth {
   exampleField: Int!
 }
 
-type Avatar {
-  """The date when the avatar was created"""
-  createdAt: DateTime!
-
-  """Filename of the avatar"""
-  filename: String!
-
-  """Unique identifier for the avatar"""
-  id: String!
-
-  """The date when the avatar was last updated"""
-  updatedAt: DateTime!
-
-  """The ID of the associated user"""
-  userId: String!
-}
-
-type Connection {
-  """The date when the connection was created"""
-  createdAt: DateTime!
-
-  """The email associated with the connection"""
-  email: String
-
-  """Unique identifier for the connection"""
-  id: String!
-
-  """The intra_42 identifier associated with the connection"""
-  intra_42: Int
-
-  """One-time password associated with the connection"""
-  otp: String
-
-  """The password associated with the connection"""
-  password: String
-
-  """The date when the connection was last updated"""
-  updatedAt: DateTime!
-
-  """The ID of the associated user"""
-  userId: String!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type Mutation {
   removeAuth(id: Int!): Auth!
-  signin: String!
-  signup(signUpInput: SignUpInput!): SignResponse!
   updateAuth(id: Int!): Auth!
 }
 
 type Query {
   auth(id: Int!): Auth!
-}
-
-type SignResponse {
-  """JSON Web Token (JWT) used for authorization and access"""
-  accessToken: String!
-
-  """Token for refreshing the JSON Web Token (JWT) when it expires"""
-  refreshToken: String!
-
-  """User entity containing user details"""
-  user: User!
-}
-
-input SignUpInput {
-  """The email address associated with the user's registration"""
-  email: String!
-
-  """The password chosen by the user for their account"""
-  password: String!
-
-  """The unique username chosen by the user for identification"""
-  username: String!
-}
-
-type User {
-  """The associated avatar entity"""
-  avatar: Avatar
-
-  """The associated connection entity"""
-  connection: Connection
-
-  """Date the user was created"""
-  createdAt: DateTime!
-
-  """Unique identifier for the user"""
-  id: String!
-
-  """Whether the user has completed their profile"""
-  profileComplete: Boolean!
-
-  """User rank"""
-  rank: Int!
-
-  """User status"""
-  status: String!
-
-  """Date the user was last updated"""
-  updatedAt: DateTime!
-
-  """Username chosen by the user"""
-  username: String
 }

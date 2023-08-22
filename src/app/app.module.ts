@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
 import { join } from 'path';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -13,6 +14,7 @@ import { AvatarModule } from '../avatar/avatar.module';
 import { AppController } from './app.controller';
 import { AuthService } from 'src/auth/auth.service';
 import { ConnectionService } from 'src/connection/connection.service';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -53,6 +55,7 @@ import { ConnectionService } from 'src/connection/connection.service';
     AuthService, // Provide Auth service throughout the application
     JwtService, // Provide JWT service throughout the application
     ConnectionService, // Provide Connection service throughout the application
+    { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
 })
 export class AppModule {}
