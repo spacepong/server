@@ -13,6 +13,10 @@ export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any) {
-    return profile;
+    return {
+      accessToken,
+      refreshToken,
+      profile,
+    };
   }
 }

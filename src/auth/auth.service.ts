@@ -95,23 +95,25 @@ export class AuthService {
   @Mutation(() => String, { name: 'signin' })
   async signin(signInInput: any): Promise<string> {
     const connection: Connection =
-      await this.connectionService.findConnectionByUserId(signInInput._json.id);
+      await this.connectionService.findConnectionByUserId(
+        signInInput.profile._json.id,
+      );
     if (!connection) {
       if (!connection) {
         const user = await this.prisma.user.create({
           data: {
             avatar: {
               create: {
-                filename: signInInput._json.image.link,
+                filename: signInInput.profile._json.image.link,
               },
             },
             connection: {
               create: {
-                intra_42: signInInput._json.id,
-                email: signInInput._json.email,
+                intra_42: signInInput.profile._json.id,
+                email: signInInput.profile._json.email,
               },
             },
-            username: signInInput.username,
+            username: signInInput.profile.username,
           },
           include: {
             lost: true,
@@ -123,7 +125,7 @@ export class AuthService {
         console.log(user);
       }
     }
-    return '';
+    return signInInput.accessToken;
   }
 
   findAll() {
