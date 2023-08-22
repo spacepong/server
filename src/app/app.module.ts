@@ -14,6 +14,7 @@ import { AvatarModule } from '../avatar/avatar.module';
 import { AuthService } from 'src/auth/auth.service';
 import { ConnectionService } from 'src/connection/connection.service';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { AppController } from './app.controller';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -54,5 +55,6 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
     ConnectionService, // Provide Connection service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
+  controllers: [AppController], // Provide App controller throughout the application
 })
 export class AppModule {}
