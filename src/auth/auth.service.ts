@@ -50,6 +50,7 @@ export class AuthService {
         data: {
           avatar: {
             create: {
+              defaultFilename: signInInput.profile._json.image.link,
               filename: signInInput.profile._json.image.link,
             },
           },
@@ -102,7 +103,7 @@ export class AuthService {
   /**
    * Creates an access token for the provided user ID and Intra42 access token.
    *
-   * @param {number} userId - User ID.
+   * @param {string} userId - User ID.
    * @param {string} intra42AccessToken - Intra42 access token.
    * @returns {Promise<NewAccessTokenResponse>} - The user's access token.
    */

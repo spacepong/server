@@ -8,7 +8,7 @@ import { SignResponse } from 'src/auth/dto/sign.response';
 import { Intra42Guard } from 'src/auth/guards/intra42.guard';
 
 @Controller('/')
-export class AppController {
+export class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
@@ -18,8 +18,18 @@ export class AppController {
   @UseGuards(Intra42Guard)
   @Get('/callback')
   async intraCallback(@Req() req: any, @Res() res: Response): Promise<void> {
+    // Sign in the user
     const response: SignResponse = await this.authService.signin(req.user);
-    console.log(response);
+
+    // Set the access token as a cookie
+    res.cookie('accessToken', response.accessToken, {
+      // Cookie is not accessible via client-side JavaScript for better security
+      httpOnly: true,
+      // Cookie is only sent to the server via HTTPS
+      secure: true,
+    });
+
+    // Redirect the user to the frontend
     res.redirect(this.configService.get<string>('FRONTEND_URL'));
   }
 }

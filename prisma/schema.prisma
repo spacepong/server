@@ -63,9 +63,10 @@ model Connection {
 }
 
 model Avatar {
-    id       String @id @default(uuid())
-    userId   String @unique
-    filename String
+    id              String @id @default(uuid())
+    userId          String @unique
+    defaultFilename String
+    filename        String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

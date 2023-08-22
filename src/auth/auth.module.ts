@@ -7,6 +7,7 @@ import { AuthResolver } from './auth.resolver';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConnectionService } from 'src/connection/connection.service';
 import { Intra42Strategy } from './strategies/intra42.strategy';
+import { AuthController } from './auth.controller';
 
 /**
  * Module for handling authentication-related functionality.
@@ -16,6 +17,9 @@ import { Intra42Strategy } from './strategies/intra42.strategy';
  */
 @Module({
   imports: [PassportModule],
+  controllers: [
+    AuthController, // Provide AuthController throughout the application
+  ],
   providers: [
     AuthResolver, // GraphQL resolver for authentication-related functionality
     AuthService, // Service for handling authentication-related functionality

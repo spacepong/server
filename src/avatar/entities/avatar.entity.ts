@@ -18,6 +18,14 @@ export class Avatar {
   id: string;
 
   /**
+   * The default filename of the avatar.
+   * @type {string}
+   */
+  @IsNotEmpty({ message: 'Default filename must not be empty' })
+  @Field(() => String, { description: 'Default filename of the avatar' })
+  defaultFilename: string;
+
+  /**
    * The filename of the avatar.
    * @type {string}
    */

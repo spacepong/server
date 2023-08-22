@@ -11,7 +11,6 @@ import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
 import { ConnectionModule } from '../connection/connection.module';
 import { AvatarModule } from '../avatar/avatar.module';
-import { AppController } from './app.controller';
 import { AuthService } from 'src/auth/auth.service';
 import { ConnectionService } from 'src/connection/connection.service';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
@@ -27,6 +26,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
     // Configure ConfigModule with environment variables
     ConfigModule.forRoot({ isGlobal: true }),
 
+    // Configure GraphQLModule with Apollo Server
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver, // Use Apollo Server
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -46,9 +46,6 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 
     // Import AvatarModule for avatar-related features
     AvatarModule,
-  ],
-  controllers: [
-    AppController, // Provide AppController throughout the application
   ],
   providers: [
     PrismaService, // Provide Prisma service throughout the application

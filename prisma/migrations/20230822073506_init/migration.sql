@@ -1,13 +1,12 @@
--- CreateEnum
-CREATE TYPE "Status" AS ENUM ('ONLINE', 'OFFLINE', 'AWAY');
-
 -- CreateTable
 CREATE TABLE "users" (
-    "id" SERIAL NOT NULL,
-    "username" VARCHAR(8),
+    "id" TEXT NOT NULL,
+    "username" TEXT,
     "profileComplete" BOOLEAN NOT NULL DEFAULT false,
     "rank" INTEGER NOT NULL DEFAULT 100,
-    "status" "Status" NOT NULL DEFAULT 'OFFLINE',
+    "followed" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "blocked" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "status" TEXT NOT NULL DEFAULT 'ONLINE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -16,10 +15,11 @@ CREATE TABLE "users" (
 
 -- CreateTable
 CREATE TABLE "matches" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
+    "score" INTEGER[] DEFAULT ARRAY[0, 0]::INTEGER[],
+    "winnerId" TEXT NOT NULL,
+    "loserId" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "winnerId" INTEGER NOT NULL,
-    "loserId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -28,8 +28,8 @@ CREATE TABLE "matches" (
 
 -- CreateTable
 CREATE TABLE "connections" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "email" TEXT,
     "password" TEXT,
     "refreshToken" TEXT,
@@ -43,10 +43,10 @@ CREATE TABLE "connections" (
 
 -- CreateTable
 CREATE TABLE "avatars" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "defaultFilename" TEXT NOT NULL,
     "filename" TEXT NOT NULL,
-    "data" BYTEA NOT NULL,
-    "userId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -67,6 +67,9 @@ CREATE UNIQUE INDEX "connections_userId_key" ON "connections"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "connections_email_key" ON "connections"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "connections_intra_42_key" ON "connections"("intra_42");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "avatars_userId_key" ON "avatars"("userId");
