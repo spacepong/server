@@ -7,6 +7,57 @@ type Auth {
   exampleField: Int!
 }
 
+type Avatar {
+  """The date when the avatar was created"""
+  createdAt: DateTime!
+
+  """Default filename of the avatar"""
+  defaultFilename: String!
+
+  """Filename of the avatar"""
+  filename: String!
+
+  """Unique identifier for the avatar"""
+  id: String!
+
+  """The date when the avatar was last updated"""
+  updatedAt: DateTime!
+
+  """The ID of the associated user"""
+  userId: String!
+}
+
+type Connection {
+  """The date when the connection was created"""
+  createdAt: DateTime!
+
+  """The email associated with the connection"""
+  email: String
+
+  """Unique identifier for the connection"""
+  id: String!
+
+  """The intra_42 identifier associated with the connection"""
+  intra_42: Int
+
+  """One-time password associated with the connection"""
+  otp: String
+
+  """The password associated with the connection"""
+  password: String
+
+  """The date when the connection was last updated"""
+  updatedAt: DateTime!
+
+  """The ID of the associated user"""
+  userId: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Mutation {
   removeAuth(id: Int!): Auth!
   updateAuth(id: Int!): Auth!
@@ -14,4 +65,39 @@ type Mutation {
 
 type Query {
   auth(id: Int!): Auth!
+
+  """Get all users"""
+  getAllUsers: [User!]!
+
+  """Get a user by ID"""
+  getUserById(id: String!): User!
+}
+
+type User {
+  """The associated avatar entity"""
+  avatar: Avatar
+
+  """The associated connection entity"""
+  connection: Connection
+
+  """Date the user was created"""
+  createdAt: DateTime!
+
+  """Unique identifier for the user"""
+  id: String!
+
+  """Whether the user has completed their profile"""
+  profileComplete: Boolean!
+
+  """User rank"""
+  rank: Int!
+
+  """User status"""
+  status: String!
+
+  """Date the user was last updated"""
+  updatedAt: DateTime!
+
+  """Username chosen by the user"""
+  username: String
 }

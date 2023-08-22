@@ -29,6 +29,8 @@ export class AuthController {
       secure: true,
     });
 
+    console.log(response.accessToken);
+
     // Redirect the user to the frontend
     res.redirect(this.configService.get<string>('FRONTEND_URL'));
   }

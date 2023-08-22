@@ -7,6 +7,7 @@ import { User } from 'src/user/entities/user.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NewAccessTokenResponse } from './dto/new-access-token.response';
 import { SignResponse } from './dto/sign.response';
+import { userIncludes } from 'src/includes/user.includes';
 
 /**
  * Service responsible for authentication-related functionality.
@@ -28,6 +29,7 @@ export class AuthService {
     private configService: ConfigService,
     private JwtService: JwtService,
   ) {}
+
   async signin(signInInput: any): Promise<SignResponse> {
     let user: User = null;
     try {
@@ -37,12 +39,7 @@ export class AuthService {
             intra_42: signInInput.profile._json.id,
           },
         },
-        include: {
-          lost: true,
-          won: true,
-          avatar: true,
-          connection: true,
-        },
+        include: userIncludes,
       });
     } catch (e) {}
     if (!user) {
@@ -62,12 +59,7 @@ export class AuthService {
           },
           username: signInInput.profile.username,
         },
-        include: {
-          lost: true,
-          won: true,
-          avatar: true,
-          connection: true,
-        },
+        include: userIncludes,
       });
     }
 
