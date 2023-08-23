@@ -65,16 +65,22 @@ type Mutation {
 type Query {
   auth: [Auth!]!
 
-  """Get all users"""
+  """Retrieves all users with their associated data"""
   getAllUsers: [User!]!
 
-  """Get a user by ID"""
+  """Retrieves a user by their ID with associated data"""
   getUserById(id: String!): User!
+
+  """Retrieves a list of users by their IDs"""
+  populateIds(ids: [String!]!): [User!]!
 }
 
 type User {
   """The associated avatar entity"""
   avatar: Avatar
+
+  """Users the user is blocking"""
+  blocked: [String!]!
 
   """The associated connection entity"""
   connection: Connection
@@ -82,11 +88,11 @@ type User {
   """Date the user was created"""
   createdAt: DateTime!
 
+  """Users the user is following"""
+  following: [String!]!
+
   """Unique identifier for the user"""
   id: String!
-
-  """Whether the user has completed their profile"""
-  profileComplete: Boolean!
 
   """User rank"""
   rank: Int!

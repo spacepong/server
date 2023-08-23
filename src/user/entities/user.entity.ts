@@ -1,11 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import {
-  IsDate,
-  IsInt,
-  IsBoolean,
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
+import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 import { Avatar } from 'src/avatar/entities/avatar.entity';
 import { Connection } from 'src/connection/entities/connection.entity';
@@ -62,18 +56,6 @@ export class User {
   username?: string;
 
   /**
-   * Whether the user has completed their profile.
-   * @type {boolean}
-   */
-  @IsNotEmpty({ message: 'Profile completion status must not be empty' })
-  @IsBoolean({ message: 'Profile completion status must be a boolean' })
-  @Field(() => Boolean, {
-    description: 'Whether the user has completed their profile',
-    defaultValue: false,
-  })
-  profileComplete: boolean;
-
-  /**
    * The rank of the user.
    * @type {number}
    */
@@ -81,6 +63,28 @@ export class User {
   @IsInt({ message: 'User rank must be an integer' })
   @Field(() => Int, { description: 'User rank', defaultValue: 100 })
   rank: number;
+
+  /**
+   * The users the user is following.
+   * @type {string[]}
+   */
+  @IsNotEmpty({ message: 'User following must not be empty' })
+  @Field(() => [String], {
+    description: 'Users the user is following',
+    defaultValue: [],
+  })
+  following?: string[];
+
+  /**
+   * The users the user is blocking.
+   * @type {string[]}
+   */
+  @IsNotEmpty({ message: 'User blocked must not be empty' })
+  @Field(() => [String], {
+    description: 'Users the user is blocking',
+    defaultValue: [],
+  })
+  blocked?: string[];
 
   /**
    * The status of the user.

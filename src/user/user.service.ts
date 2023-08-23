@@ -75,4 +75,21 @@ export class UserService {
       include: userIncludes,
     });
   }
+
+  /**
+   * Retrieves a list of users by their IDs.
+   *
+   * @param {string[]} userIds - The IDs of the users to retrieve.
+   * @returns {Promise<User[]>} A promise that resolves to the requested users.
+   */
+  populateIds(userIds: string[]): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          in: userIds,
+        },
+      },
+      include: userIncludes,
+    });
+  }
 }

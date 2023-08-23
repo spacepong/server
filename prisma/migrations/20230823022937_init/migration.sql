@@ -2,9 +2,8 @@
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "username" TEXT,
-    "profileComplete" BOOLEAN NOT NULL DEFAULT false,
     "rank" INTEGER NOT NULL DEFAULT 100,
-    "followed" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "following" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "blocked" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "status" TEXT NOT NULL DEFAULT 'ONLINE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

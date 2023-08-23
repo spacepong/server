@@ -23,7 +23,10 @@ export class UserResolver {
    *
    * @returns {Promise<User[]>} A list of user entities.
    */
-  @Query(() => [User], { name: 'getAllUsers', description: 'Get all users' })
+  @Query(() => [User], {
+    name: 'getAllUsers',
+    description: 'Retrieves all users with their associated data',
+  })
   getAllUsers(): Promise<User[]> {
     return this.userService.getAllUsers();
   }
@@ -34,8 +37,27 @@ export class UserResolver {
    * @param {string} id - The ID of the user.
    * @returns {Promise<User>} The user entity.
    */
-  @Query(() => User, { name: 'getUserById', description: 'Get a user by ID' })
+  @Query(() => User, {
+    name: 'getUserById',
+    description: 'Retrieves a user by their ID with associated data',
+  })
   getUserById(@Args('id', { type: () => String }) id: string): Promise<User> {
     return this.userService.getUserById(id);
+  }
+
+  /**
+   * Query to fetch a list of users by their IDs.
+   *
+   * @param {string[]} ids - The IDs of the users.
+   * @returns {Promise<User[]>} The user entities.
+   */
+  @Query(() => [User], {
+    name: 'populateIds',
+    description: 'Retrieves a list of users by their IDs',
+  })
+  populateIds(
+    @Args('ids', { type: () => [String] }) ids: string[],
+  ): Promise<User[]> {
+    return this.userService.populateIds(ids);
   }
 }

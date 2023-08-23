@@ -11,17 +11,16 @@ datasource db {
 }
 
 model User {
-    id              String      @id @default(uuid())
-    connection      Connection?
-    avatar          Avatar?
-    username        String?     @unique
-    profileComplete Boolean     @default(false)
-    rank            Int         @default(100)
-    followed        String[]    @default([])
-    blocked         String[]    @default([])
-    status          String      @default("ONLINE")
-    won             Match[]     @relation("WonMatch")
-    lost            Match[]     @relation("LostMatch")
+    id         String      @id @default(uuid())
+    connection Connection?
+    avatar     Avatar?
+    username   String?     @unique
+    rank       Int         @default(100)
+    following  String[]    @default([])
+    blocked    String[]    @default([])
+    status     String      @default("ONLINE")
+    won        Match[]     @relation("WonMatch")
+    lost       Match[]     @relation("LostMatch")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
