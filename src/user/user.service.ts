@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { User } from './entities/user.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -44,7 +48,7 @@ export class UserService {
       },
       include: userIncludes,
     });
-    if (!user) throw new ForbiddenException('User not found');
+    if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
@@ -91,5 +95,28 @@ export class UserService {
       },
       include: userIncludes,
     });
+  }
+
+  /**
+   * Updates the username of a user.
+   *
+   * @param {string} id - The ID of the user to update.
+   * @param {string} username - The new username of the user.
+   * @returns {Promise<User>} A promise that resolves to the updated user.
+   */
+  updateUsername(id: string, username: string): Promise<User> {
+    try {
+      return this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          username,
+        },
+        include: userIncludes,
+      });
+    } catch (e) {
+      throw new ForbiddenException('Unable to update username');
+    }
   }
 }

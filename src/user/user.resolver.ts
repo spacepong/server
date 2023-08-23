@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -59,5 +59,24 @@ export class UserResolver {
     @Args('ids', { type: () => [String] }) ids: string[],
   ): Promise<User[]> {
     return this.userService.populateIds(ids);
+  }
+
+  /**
+   * Mutation to update the username of a user.
+   *
+   * @param {string} id - The ID of the user.
+   * @param {string} username - The new username of the user.
+   * @returns {Promise<User>} The updated user entity.
+   * @throws {ForbiddenException} If the username cannot be updated.
+   */
+  @Mutation(() => User, {
+    name: 'updateUsername',
+    description: 'Updates the username of a user',
+  })
+  updateUsername(
+    @Args('id', { type: () => String }) id: string,
+    @Args('username', { type: () => String }) username: string,
+  ): Promise<User> {
+    return this.userService.updateUsername(id, username);
   }
 }
