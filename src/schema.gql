@@ -59,8 +59,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Mutation {
+  """Blocks a user"""
+  blockUser(blockId: String!, userId: String!): User!
+
   """Follows a user"""
   followUser(followId: String!, userId: String!): User!
+
+  """Unblocks a user"""
+  unblockUser(unblockId: String!, userId: String!): User!
 
   """Unfollows a user"""
   unfollowUser(unfollowId: String!, userId: String!): User!

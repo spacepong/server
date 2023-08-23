@@ -119,4 +119,44 @@ export class UserResolver {
   ): Promise<User> {
     return this.userService.unfollowUser(userId, unfollowId);
   }
+
+  /**
+   * Mutation to block a user.
+   *
+   * @param {string} userId - The ID of the user.
+   * @param {string} blockId - The ID of the user to block.
+   * @returns {Promise<User>} The updated user entity.
+   * @throws {ForbiddenException} If the user tries to block themselves.
+   * @throws {NotFoundException} If the user or the user to block is not found.
+   */
+  @Mutation(() => User, {
+    name: 'blockUser',
+    description: 'Blocks a user',
+  })
+  blockUser(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('blockId', { type: () => String }) blockId: string,
+  ): Promise<User> {
+    return this.userService.blockUser(userId, blockId);
+  }
+
+  /**
+   * Mutation to unblock a user.
+   *
+   * @param {string} userId - The ID of the user.
+   * @param {string} unblockId - The ID of the user to unblock.
+   * @returns {Promise<User>} The updated user entity.
+   * @throws {ForbiddenException} If the user tries to unblock themselves.
+   * @throws {NotFoundException} If the user or the user to unblock is not found.
+   */
+  @Mutation(() => User, {
+    name: 'unblockUser',
+    description: 'Unblocks a user',
+  })
+  unblockUser(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('unblockId', { type: () => String }) unblockId: string,
+  ): Promise<User> {
+    return this.userService.unblockUser(userId, unblockId);
+  }
 }
