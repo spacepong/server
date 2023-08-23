@@ -5,9 +5,9 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ConnectionService } from 'src/connection/connection.service';
 import { Intra42Strategy } from './strategies/intra42.strategy';
 import { AuthController } from './auth.controller';
+import { UserService } from 'src/user/user.service';
 
 /**
  * Module for handling authentication-related functionality.
@@ -25,7 +25,7 @@ import { AuthController } from './auth.controller';
     AuthService, // Service for handling authentication-related functionality
     JwtService, // Service for handling JWTs
     PrismaService, // Service for handling database interactions
-    ConnectionService, // Service for handling connections
+    UserService, // Service for handling user-related functionality
     Intra42Strategy, // Passport strategy for authenticating with 42 intra
   ],
 })

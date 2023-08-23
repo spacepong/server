@@ -23,18 +23,8 @@ export class AuthResolver {
     return this.authService.findAll();
   }
 
-  @Query(() => Auth, { name: 'auth' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.authService.findOne(id);
-  }
-
   @Mutation(() => Auth)
   updateAuth(@Args('id', { type: () => Int }) id: number) {
     return this.authService.update(id);
-  }
-
-  @Mutation(() => Auth)
-  removeAuth(@Args('id', { type: () => Int }) id: number) {
-    return this.authService.remove(id);
   }
 }

@@ -47,4 +47,32 @@ export class UserService {
     if (!user) throw new ForbiddenException('User not found');
     return user;
   }
+
+  /**
+   * Creates a new user.
+   *
+   * @param {any} signInInput - The sign-in input data.
+   * @param {string} username - The username of the user.
+   * @returns {Promise<User>} A promise that resolves to the created user.
+   */
+  async createUser(signInInput: any, username: string): Promise<User> {
+    return this.prisma.user.create({
+      data: {
+        avatar: {
+          create: {
+            defaultFilename: signInInput.profile._json.image.link,
+            filename: signInInput.profile._json.image.link,
+          },
+        },
+        connection: {
+          create: {
+            intra_42: signInInput.profile._json.id,
+            email: signInInput.profile._json.email,
+          },
+        },
+        username,
+      },
+      include: userIncludes,
+    });
+  }
 }

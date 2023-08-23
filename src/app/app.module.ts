@@ -13,6 +13,7 @@ import { ConnectionModule } from '../connection/connection.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { AuthService } from 'src/auth/auth.service';
 import { ConnectionService } from 'src/connection/connection.service';
+import { UserService } from 'src/user/user.service';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { AppController } from './app.controller';
 
@@ -52,6 +53,7 @@ import { AppController } from './app.controller';
     PrismaService, // Provide Prisma service throughout the application
     AuthService, // Provide Auth service throughout the application
     JwtService, // Provide JWT service throughout the application
+    UserService, // Provide User service throughout the application
     ConnectionService, // Provide Connection service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
