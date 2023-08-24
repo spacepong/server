@@ -145,7 +145,7 @@ export class UserRelationsService {
         data: {
           following: {
             set: user.following.filter(
-              (followedUser) => followedUser !== unfollowId,
+              (followedUser: string) => followedUser !== unfollowId,
             ),
           },
         },
@@ -272,7 +272,7 @@ export class UserRelationsService {
         data: {
           blocked: {
             set: user.blocked.filter(
-              (blockedUser) => blockedUser !== unblockId,
+              (blockedUser: string) => blockedUser !== unblockId,
             ),
           },
         },

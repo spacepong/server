@@ -81,6 +81,25 @@ export class UserResolver {
   }
 
   /**
+   * Mutation to update the avatar of a user.
+   *
+   * @param {string} userId - The ID of the user.
+   * @param {string} avatar - The new avatar of the user.
+   * @returns {Promise<User>} The updated user entity.
+   * @throws {ForbiddenException} If the avatar cannot be updated.
+   */
+  @Mutation(() => User, {
+    name: 'updateAvatar',
+    description: 'Updates the avatar of a user',
+  })
+  updateAvatar(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('avatar', { type: () => String }) avatar: string,
+  ): Promise<User> {
+    return this.userService.updateAvatar(userId, avatar);
+  }
+
+  /**
    * Mutation to follow a user.
    *
    * @param {string} userId - The ID of the user.

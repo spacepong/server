@@ -107,8 +107,18 @@ export class UserService {
    * @param {string} id - The ID of the user to update.
    * @param {string} username - The new username of the user.
    * @returns {Promise<User>} A promise that resolves to the updated user.
+   * @throws {ForbiddenException} If the username is too short or if the update fails.
    */
   updateUsername(id: string, username: string): Promise<User> {
+    /**
+     * Remove all whitespace from the username.
+     * This is done to prevent users from having a username that is only whitespace.
+     * This is also done to prevent users from having a username that starts or ends with whitespace.
+     */
+    username = username.replace(/\s+/g, '');
+    if (username.length < 3)
+      throw new ForbiddenException('Username must be at least 3 characters');
+
     try {
       return this.prisma.user.update({
         where: {
@@ -121,6 +131,34 @@ export class UserService {
       });
     } catch (e) {
       throw new ForbiddenException('Unable to update username');
+    }
+  }
+
+  /**
+   * Updates the avatar of a user.
+   *
+   * @param {string} userId - The ID of the user to update.
+   * @param {string} avatar - The new avatar of the user.
+   * @returns {Promise<User>} A promise that resolves to the updated user.
+   * @throws {ForbiddenException} If the avatar cannot be updated.
+   */
+  updateAvatar(userId: string, avatar: string): Promise<User> {
+    try {
+      return this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          avatar: {
+            update: {
+              filename: avatar,
+            },
+          },
+        },
+        include: userIncludes,
+      });
+    } catch (e) {
+      throw new ForbiddenException('Unable to update avatar');
     }
   }
 
