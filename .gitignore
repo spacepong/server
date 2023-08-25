@@ -7,6 +7,9 @@
 .env.test
 .env.production
 
+# user uploads
+uploads/*.png
+
 # Logs
 logs
 *.log
