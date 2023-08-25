@@ -77,9 +77,6 @@ type Mutation {
 
   """Updates the username of a user"""
   updateUsername(id: String!, username: String!): User!
-
-  """Uploads an avatar for the user"""
-  uploadAvatar(avatar: Upload!, userId: String!): User!
 }
 
 type Query {
@@ -94,9 +91,6 @@ type Query {
   """Retrieves a list of users by their IDs"""
   populateIds(ids: [String!]!): [User!]!
 }
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
 
 type User {
   """The associated avatar entity"""

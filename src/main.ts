@@ -1,8 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
-
 import { AppModule } from './app/app.module';
 
 /**
@@ -17,12 +15,6 @@ async function bootstrap(): Promise<void> {
 
   // Apply a global validation pipe to handle input validation
   app.useGlobalPipes(new ValidationPipe());
-
-  // Apply the graphqlUploadExpress middleware to handle file uploads
-  app.use(
-    '/graphql',
-    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
-  );
 
   // Start listening on the specified port
   await app.listen(process.env.PORT || 3000);
