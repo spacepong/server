@@ -9,4 +9,6 @@
 export interface JwtPayload {
   userId: string;
   intra42AccessToken: string;
+  is2faEnabled: boolean;
+  is2faAuthenticated: boolean;
 }

@@ -75,7 +75,6 @@ export class UserService {
         connection: {
           create: {
             intra_42: signInInput.profile._json.id,
-            email: signInInput.profile._json.email,
           },
         },
         username,

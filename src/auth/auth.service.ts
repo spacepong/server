@@ -2,6 +2,8 @@
 import { JwtService } from '@nestjs/jwt';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 import * as crypto from 'crypto';
 
@@ -123,6 +125,8 @@ export class AuthService {
   async createAccessToken(
     userId: string,
     intra42AccessToken: string,
+    is2faEnabled: boolean = false,
+    is2faAuthenticated: boolean = false,
   ): Promise<NewAccessTokenResponse> {
     /**
      * Create a new access token for the user.
@@ -139,5 +143,88 @@ export class AuthService {
         },
       ),
     };
+  }
+
+  async generate2faSecret(
+    user: User,
+  ): Promise<{ secret: string; otpAuthUrl: string }> {
+    const secret: string = authenticator.generateSecret();
+    const otpAuthUrl: string = authenticator.keyuri(
+      user.username,
+      this.configService.get('TWO_FACTOR_AUTHENTICATION_APP_NAME'),
+      secret,
+    );
+    await this.set2faSecret(user.id, secret);
+    return { secret, otpAuthUrl };
+  }
+
+  async set2faSecret(userId: string, secret: string): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        connection: {
+          update: {
+            otp: secret,
+          },
+        },
+      },
+      include: userIncludes,
+    });
+  }
+
+  async generateQrCodeDataURL(otpAuthUrl: string): Promise<string> {
+    return toDataURL(otpAuthUrl);
+  }
+
+  async turnOn2fa(userId: string): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        connection: {
+          update: {
+            is2faEnabled: true,
+          },
+        },
+      },
+      include: userIncludes,
+    });
+  }
+
+  async turnOff2fa(userId: string): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        connection: {
+          update: {
+            otp: null,
+            otpCreatedAt: null,
+            is2faEnabled: false,
+          },
+        },
+      },
+      include: userIncludes,
+    });
+  }
+
+  async verify2faToken(userId: string, token: string): Promise<boolean> {
+    const user: User = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: userIncludes,
+    });
+
+    if (!user) return false;
+
+    return authenticator.verify({
+      token,
+      secret: user.connection.otp,
+    });
   }
 }

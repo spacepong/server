@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsDate, IsEmail, IsInt, IsNotEmpty } from 'class-validator';
+import { IsBoolean, IsDate, IsInt, IsNotEmpty } from 'class-validator';
 
 /**
  * Represents a connection entity that stores user-related data.
@@ -26,29 +26,6 @@ export class Connection {
   userId: string;
 
   /**
-   * The email associated with the connection.
-   * @type {string}
-   */
-  @IsNotEmpty({ message: 'Email must not be empty' })
-  @IsEmail({}, { message: 'Email must be a valid email address' })
-  @Field(() => String, {
-    description: 'The email associated with the connection',
-    nullable: true,
-  })
-  email?: string;
-
-  /**
-   * The password associated with the connection.
-   * @type {string}
-   */
-  @IsNotEmpty({ message: 'Password must not be empty' })
-  @Field(() => String, {
-    description: 'The password associated with the connection',
-    nullable: true,
-  })
-  password?: string;
-
-  /**
    * One-time password associated with the connection.
    * @type {string}
    */
@@ -58,6 +35,32 @@ export class Connection {
     nullable: true,
   })
   otp?: string;
+
+  /**
+   * The date when the one-time password was created.
+   * @type {Date}
+   */
+  @IsNotEmpty({ message: 'OTP created at must not be empty' })
+  @IsDate({ message: 'OTP created at must be a valid date' })
+  @Field(() => Date, {
+    description: 'The date when the one-time password was created',
+    nullable: true,
+  })
+  otpCreatedAt?: Date;
+
+  /**
+   * Indicates whether two-factor authentication is enabled for the connection.
+   * @type {boolean}
+   * @default false
+   */
+  @IsNotEmpty({ message: 'Is 2FA enabled must not be empty' })
+  @IsBoolean({ message: 'Is 2FA enabled must be a boolean' })
+  @Field(() => Boolean, {
+    description:
+      'Indicates whether two-factor authentication is enabled for the connection',
+    defaultValue: false,
+  })
+  is2faEnabled: boolean;
 
   /**
    * The intra_42 identifier associated with the connection.

@@ -45,13 +45,12 @@ model Match {
 }
 
 model Connection {
-    id           String  @id @default(uuid())
-    userId       String  @unique
-    email        String? @unique
-    password     String?
-    refreshToken String?
+    id           String    @id @default(uuid())
+    userId       String    @unique
     otp          String?
-    intra_42     Int?    @unique
+    otpCreatedAt DateTime?
+    is2faEnabled Boolean   @default(false)
+    intra_42     Int?      @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

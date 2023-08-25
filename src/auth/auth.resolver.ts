@@ -1,7 +1,9 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
 
 import { Auth } from './entities/auth.entity';
 import { AuthService } from './auth.service';
+import { User } from 'src/user/entities/user.entity';
+import { ForbiddenException } from '@nestjs/common';
 
 /**
  * Resolver class for handling GraphQL queries and mutations related to authentication.
@@ -18,13 +20,52 @@ export class AuthResolver {
    */
   constructor(private readonly authService: AuthService) {}
 
-  @Query(() => [Auth], { name: 'auth' })
-  findAll() {
-    return this.authService.findAll();
+  @Mutation(() => Auth, {
+    name: 'turnOn2fa',
+    description: 'Turns on 2FA for the current user',
+  })
+  async turnOn2fa(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('token', { type: () => String }) token: string,
+  ): Promise<User> {
+    const isTokenValid: boolean = await this.authService.verify2faToken(
+      userId,
+      token,
+    );
+
+    if (!isTokenValid)
+      throw new ForbiddenException('Wrong authentication token');
+
+    return this.authService.turnOn2fa(userId);
   }
 
-  @Mutation(() => Auth)
-  updateAuth(@Args('id', { type: () => Int }) id: number) {
-    return this.authService.update(id);
+  @Mutation(() => Auth, {
+    name: 'turnOff2fa',
+    description: 'Turns off 2FA for the current user',
+  })
+  async turnOff2fa(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('token', { type: () => String }) token: string,
+  ): Promise<User> {
+    const isTokenValid: boolean = await this.authService.verify2faToken(
+      userId,
+      token,
+    );
+
+    if (!isTokenValid)
+      throw new ForbiddenException('Wrong authentication token');
+
+    return this.authService.turnOff2fa(userId);
+  }
+
+  @Mutation(() => Auth, {
+    name: 'verify2fa',
+    description: 'Verifies a 2FA token for the current user',
+  })
+  async verify2fa(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('token', { type: () => String }) token: string,
+  ): Promise<boolean> {
+    return this.authService.verify2faToken(userId, token);
   }
 }
