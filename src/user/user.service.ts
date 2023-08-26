@@ -103,12 +103,12 @@ export class UserService {
   /**
    * Updates the username of a user.
    *
-   * @param {string} id - The ID of the user to update.
+   * @param {string} userId - The ID of the user to update.
    * @param {string} username - The new username of the user.
    * @returns {Promise<User>} A promise that resolves to the updated user.
    * @throws {ForbiddenException} If the username is too short or if the update fails.
    */
-  updateUsername(id: string, username: string): Promise<User> {
+  updateUsername(userId: string, username: string): Promise<User> {
     /**
      * Remove all whitespace from the username.
      * This is done to prevent users from having a username that is only whitespace.
@@ -121,7 +121,7 @@ export class UserService {
     try {
       return this.prisma.user.update({
         where: {
-          id,
+          id: userId,
         },
         data: {
           username,

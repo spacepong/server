@@ -95,7 +95,7 @@ type Mutation {
   updateAvatar(avatar: String!, userId: String!): User!
 
   """Updates the username of a user"""
-  updateUsername(id: String!, username: String!): User!
+  updateUsername(userId: String!, username: String!): User!
 
   """Verifies a 2FA token for the current user"""
   verify2fa(token: String!, userId: String!): Auth!
