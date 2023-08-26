@@ -1,13 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JwtService } from '@nestjs/jwt';
-import {
-  ForbiddenException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
 
 import * as crypto from 'crypto';
 
@@ -36,10 +30,10 @@ export class AuthService {
    * @param {UserService} userService - The user service for interacting with user-related data.
    */
   constructor(
-    private prisma: PrismaService,
-    private configService: ConfigService,
-    private JwtService: JwtService,
-    private userService: UserService,
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+    private readonly JwtService: JwtService,
+    private readonly userService: UserService,
   ) {}
 
   /**
@@ -136,25 +130,6 @@ export class AuthService {
   }
 
   /**
-   * Fetches all auth records.
-   *
-   * @returns {string} - A message indicating that this action returns all auth.
-   */
-  findAll(): string {
-    return `This action returns all auth`;
-  }
-
-  /**
-   * Updates an auth record by ID.
-   *
-   * @param {number} id - The ID of the auth record to update.
-   * @returns {string} - A message indicating that this action updates an auth record.
-   */
-  update(id: number): string {
-    return `This action updates a #${id} auth`;
-  }
-
-  /**
    * Creates an access token for the provided user ID and Intra42 access token.
    *
    * @param {string} userId - User ID.
@@ -184,93 +159,5 @@ export class AuthService {
         },
       ),
     };
-  }
-
-  async generate2faSecret(
-    userId: string,
-    username: string,
-  ): Promise<{ secret: string; otpAuthUrl: string }> {
-    const secret: string = authenticator.generateSecret();
-    const otpAuthUrl: string = authenticator.keyuri(
-      username,
-      this.configService.get('TWO_FACTOR_AUTHENTICATION_APP_NAME'),
-      secret,
-    );
-    await this.set2faSecret(userId, secret);
-    return { secret, otpAuthUrl };
-  }
-
-  async set2faSecret(userId: string, secret: string): Promise<User> {
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        connection: {
-          update: {
-            otp: secret,
-            otpCreatedAt: new Date(),
-          },
-        },
-      },
-      include: userIncludes,
-    });
-  }
-
-  async generateQrCodeDataURL(otpAuthUrl: string): Promise<string> {
-    return toDataURL(otpAuthUrl);
-  }
-
-  async turnOn2fa(userId: string): Promise<User> {
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        connection: {
-          update: {
-            is2faEnabled: true,
-          },
-        },
-      },
-      include: userIncludes,
-    });
-  }
-
-  async turnOff2fa(userId: string): Promise<User> {
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        connection: {
-          update: {
-            otp: null,
-            otpCreatedAt: null,
-            is2faEnabled: false,
-          },
-        },
-      },
-      include: userIncludes,
-    });
-  }
-
-  async verify2faToken(userId: string, token: string): Promise<boolean> {
-    const user: User = await this.prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-      include: userIncludes,
-    });
-
-    if (!user) return false;
-
-    if (!user.connection.otp)
-      throw new ForbiddenException('2FA is not enabled');
-
-    return authenticator.verify({
-      token,
-      secret: user.connection.otp,
-    });
   }
 }
