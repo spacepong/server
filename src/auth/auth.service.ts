@@ -11,6 +11,7 @@ import { NewAccessTokenResponse } from './dto/new-access-token.response';
 import { SignResponse } from './dto/sign.response';
 import { userIncludes } from 'src/includes/user.includes';
 import { UserService } from 'src/user/user.service';
+import { SignIn2faInput } from './dto/signin-2fa.input';
 
 /**
  * Service responsible for authentication-related functionality.
@@ -29,10 +30,10 @@ export class AuthService {
    * @param {UserService} userService - The user service for interacting with user-related data.
    */
   constructor(
-    private prisma: PrismaService,
-    private configService: ConfigService,
-    private JwtService: JwtService,
-    private userService: UserService,
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+    private readonly JwtService: JwtService,
+    private readonly userService: UserService,
   ) {}
 
   /**
@@ -87,6 +88,7 @@ export class AuthService {
       accessToken: await this.createAccessToken(
         user.id,
         signInInput.accessToken,
+        user.connection.is2faEnabled,
       ).then((response: NewAccessTokenResponse) => response.accessToken),
       intra42AccessToken: signInInput.accessToken,
       intra42RefreshToken: signInInput.refreshToken,
@@ -95,22 +97,36 @@ export class AuthService {
   }
 
   /**
-   * Fetches all auth records.
+   * Handles the user sign-in process with 2FA.
    *
-   * @returns {string} - A message indicating that this action returns all auth.
+   * @param {SignIn2faInput} signInInput - The sign-in input data.
+   * @returns {Promise<SignResponse>} - The sign-in response including access tokens and user data.
    */
-  findAll(): string {
-    return `This action returns all auth`;
-  }
+  async signin2fa(signInInput: SignIn2faInput): Promise<SignResponse> {
+    let user: User = null;
+    try {
+      user = await this.prisma.user.findFirst({
+        where: {
+          id: signInInput.userId,
+        },
+        include: userIncludes,
+      });
+    } catch (e) {}
 
-  /**
-   * Updates an auth record by ID.
-   *
-   * @param {number} id - The ID of the auth record to update.
-   * @returns {string} - A message indicating that this action updates an auth record.
-   */
-  update(id: number): string {
-    return `This action updates a #${id} auth`;
+    if (!user)
+      throw new InternalServerErrorException('Unable to retrieve user');
+
+    return {
+      accessToken: await this.createAccessToken(
+        user.id,
+        signInInput.intra42AccessToken,
+        user.connection.is2faEnabled,
+        true,
+      ).then((response: NewAccessTokenResponse) => response.accessToken),
+      intra42AccessToken: signInInput.intra42AccessToken,
+      intra42RefreshToken: signInInput.intra42RefreshToken,
+      user: user,
+    };
   }
 
   /**
@@ -118,11 +134,15 @@ export class AuthService {
    *
    * @param {string} userId - User ID.
    * @param {string} intra42AccessToken - Intra42 access token.
+   * @param {boolean} is2faEnabled - Whether or not 2FA is enabled for the user.
+   * @param {boolean} is2faAuthenticated - Whether or not 2FA is authenticated for the user.
    * @returns {Promise<NewAccessTokenResponse>} - The user's access token.
    */
   async createAccessToken(
     userId: string,
     intra42AccessToken: string,
+    is2faEnabled: boolean = false,
+    is2faAuthenticated: boolean = false,
   ): Promise<NewAccessTokenResponse> {
     /**
      * Create a new access token for the user.
@@ -132,7 +152,7 @@ export class AuthService {
      */
     return {
       accessToken: this.JwtService.sign(
-        { userId, intra42AccessToken },
+        { userId, intra42AccessToken, is2faEnabled, is2faAuthenticated },
         {
           algorithm: 'HS256',
           secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
