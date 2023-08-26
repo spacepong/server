@@ -3,8 +3,17 @@
 # ------------------------------------------------------
 
 type Auth {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """The 2FA validation"""
+  is2faValid: Boolean
+
+  """The OTP URL"""
+  otpAuthUrl: String
+
+  """The status"""
+  status: String
+
+  """The user object"""
+  user: User
 }
 
 type Avatar {
@@ -67,6 +76,12 @@ type Mutation {
   """Follows a user"""
   followUser(followId: String!, userId: String!): User!
 
+  """Generates a 2FA token for the current user"""
+  generate2faToken(userId: String!, username: String!): Auth!
+
+  """Signs in a user with 2FA"""
+  signin2fa(signIn2faInput: SignIn2faInput!): Auth!
+
   """Turns off 2FA for the current user"""
   turnOff2fa(token: String!, userId: String!): Auth!
 
@@ -98,6 +113,20 @@ type Query {
 
   """Retrieves a list of users by their IDs"""
   populateIds(ids: [String!]!): [User!]!
+}
+
+input SignIn2faInput {
+  """The Intra42 access token"""
+  intra42AccessToken: String!
+
+  """The Intra42 refresh token"""
+  intra42RefreshToken: String!
+
+  """The 2FA token"""
+  token: String!
+
+  """The ID of the user to sign in with 2FA"""
+  userId: String!
 }
 
 type User {

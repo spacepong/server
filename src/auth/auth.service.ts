@@ -1,6 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JwtService } from '@nestjs/jwt';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
@@ -13,6 +17,7 @@ import { NewAccessTokenResponse } from './dto/new-access-token.response';
 import { SignResponse } from './dto/sign.response';
 import { userIncludes } from 'src/includes/user.includes';
 import { UserService } from 'src/user/user.service';
+import { SignIn2faInput } from './dto/signin-2fa.input';
 
 /**
  * Service responsible for authentication-related functionality.
@@ -89,10 +94,44 @@ export class AuthService {
       accessToken: await this.createAccessToken(
         user.id,
         signInInput.accessToken,
+        user.connection.is2faEnabled,
       ).then((response: NewAccessTokenResponse) => response.accessToken),
       intra42AccessToken: signInInput.accessToken,
       intra42RefreshToken: signInInput.refreshToken,
       user,
+    };
+  }
+
+  /**
+   * Handles the user sign-in process with 2FA.
+   *
+   * @param {SignIn2faInput} signInInput - The sign-in input data.
+   * @returns {Promise<SignResponse>} - The sign-in response including access tokens and user data.
+   */
+  async signin2fa(signInInput: SignIn2faInput): Promise<SignResponse> {
+    let user: User = null;
+    try {
+      user = await this.prisma.user.findFirst({
+        where: {
+          id: signInInput.userId,
+        },
+        include: userIncludes,
+      });
+    } catch (e) {}
+
+    if (!user)
+      throw new InternalServerErrorException('Unable to retrieve user');
+
+    return {
+      accessToken: await this.createAccessToken(
+        user.id,
+        signInInput.intra42AccessToken,
+        user.connection.is2faEnabled,
+        true,
+      ).then((response: NewAccessTokenResponse) => response.accessToken),
+      intra42AccessToken: signInInput.intra42AccessToken,
+      intra42RefreshToken: signInInput.intra42RefreshToken,
+      user: user,
     };
   }
 
@@ -120,6 +159,8 @@ export class AuthService {
    *
    * @param {string} userId - User ID.
    * @param {string} intra42AccessToken - Intra42 access token.
+   * @param {boolean} is2faEnabled - Whether or not 2FA is enabled for the user.
+   * @param {boolean} is2faAuthenticated - Whether or not 2FA is authenticated for the user.
    * @returns {Promise<NewAccessTokenResponse>} - The user's access token.
    */
   async createAccessToken(
@@ -136,7 +177,7 @@ export class AuthService {
      */
     return {
       accessToken: this.JwtService.sign(
-        { userId, intra42AccessToken },
+        { userId, intra42AccessToken, is2faEnabled, is2faAuthenticated },
         {
           algorithm: 'HS256',
           secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
@@ -146,15 +187,16 @@ export class AuthService {
   }
 
   async generate2faSecret(
-    user: User,
+    userId: string,
+    username: string,
   ): Promise<{ secret: string; otpAuthUrl: string }> {
     const secret: string = authenticator.generateSecret();
     const otpAuthUrl: string = authenticator.keyuri(
-      user.username,
+      username,
       this.configService.get('TWO_FACTOR_AUTHENTICATION_APP_NAME'),
       secret,
     );
-    await this.set2faSecret(user.id, secret);
+    await this.set2faSecret(userId, secret);
     return { secret, otpAuthUrl };
   }
 
@@ -167,6 +209,7 @@ export class AuthService {
         connection: {
           update: {
             otp: secret,
+            otpCreatedAt: new Date(),
           },
         },
       },
@@ -221,6 +264,9 @@ export class AuthService {
     });
 
     if (!user) return false;
+
+    if (!user.connection.otp)
+      throw new ForbiddenException('2FA is not enabled');
 
     return authenticator.verify({
       token,
