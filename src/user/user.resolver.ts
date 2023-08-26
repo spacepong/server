@@ -1,7 +1,10 @@
+import { ForbiddenException } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { DEBUG } from 'src/constants';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { CurrentUserId } from 'src/auth/decorators/current-userid.decorator';
 
 /**
  * Resolver for handling User-related GraphQL queries.
@@ -64,7 +67,8 @@ export class UserResolver {
   /**
    * Mutation to update the username of a user.
    *
-   * @param {string} id - The ID of the user.
+   * @param {string} id - The ID of the user making the request.
+   * @param {string} userId - The ID of the user.
    * @param {string} username - The new username of the user.
    * @returns {Promise<User>} The updated user entity.
    * @throws {ForbiddenException} If the username cannot be updated.
@@ -74,15 +78,19 @@ export class UserResolver {
     description: 'Updates the username of a user',
   })
   updateUsername(
-    @Args('id', { type: () => String }) id: string,
+    @CurrentUserId() id: string,
+    @Args('userId', { type: () => String }) userId: string,
     @Args('username', { type: () => String }) username: string,
   ): Promise<User> {
-    return this.userService.updateUsername(id, username);
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
+    return this.userService.updateUsername(userId, username);
   }
 
   /**
    * Mutation to update the avatar of a user.
    *
+   * @param {string} id - The ID of the user making the request.
    * @param {string} userId - The ID of the user.
    * @param {string} avatar - The new avatar of the user.
    * @returns {Promise<User>} The updated user entity.
@@ -93,15 +101,19 @@ export class UserResolver {
     description: 'Updates the avatar of a user',
   })
   updateAvatar(
+    @CurrentUserId() id: string,
     @Args('userId', { type: () => String }) userId: string,
     @Args('avatar', { type: () => String }) avatar: string,
   ): Promise<User> {
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
     return this.userService.updateAvatar(userId, avatar);
   }
 
   /**
    * Mutation to follow a user.
    *
+   * @param {string} id - The ID of the user making the request.
    * @param {string} userId - The ID of the user.
    * @param {string} followId - The ID of the user to follow.
    * @returns {Promise<User>} The updated user entity.
@@ -113,15 +125,19 @@ export class UserResolver {
     description: 'Follows a user',
   })
   followUser(
+    @CurrentUserId() id: string,
     @Args('userId', { type: () => String }) userId: string,
     @Args('followId', { type: () => String }) followId: string,
   ): Promise<User> {
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
     return this.userService.followUser(userId, followId);
   }
 
   /**
    * Mutation to unfollow a user.
    *
+   * @param {string} id - The ID of the user making the request.
    * @param {string} userId - The ID of the user.
    * @param {string} unfollowId - The ID of the user to unfollow.
    * @returns {Promise<User>} The updated user entity.
@@ -133,15 +149,19 @@ export class UserResolver {
     description: 'Unfollows a user',
   })
   unfollowUser(
+    @CurrentUserId() id: string,
     @Args('userId', { type: () => String }) userId: string,
     @Args('unfollowId', { type: () => String }) unfollowId: string,
   ): Promise<User> {
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
     return this.userService.unfollowUser(userId, unfollowId);
   }
 
   /**
    * Mutation to block a user.
    *
+   * @param {string} id - The ID of the user making the request.
    * @param {string} userId - The ID of the user.
    * @param {string} blockId - The ID of the user to block.
    * @returns {Promise<User>} The updated user entity.
@@ -153,15 +173,19 @@ export class UserResolver {
     description: 'Blocks a user',
   })
   blockUser(
+    @CurrentUserId() id: string,
     @Args('userId', { type: () => String }) userId: string,
     @Args('blockId', { type: () => String }) blockId: string,
   ): Promise<User> {
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
     return this.userService.blockUser(userId, blockId);
   }
 
   /**
    * Mutation to unblock a user.
    *
+   * @param {string} id - The ID of the user making the request.
    * @param {string} userId - The ID of the user.
    * @param {string} unblockId - The ID of the user to unblock.
    * @returns {Promise<User>} The updated user entity.
@@ -173,9 +197,12 @@ export class UserResolver {
     description: 'Unblocks a user',
   })
   unblockUser(
+    @CurrentUserId() id: string,
     @Args('userId', { type: () => String }) userId: string,
     @Args('unblockId', { type: () => String }) unblockId: string,
   ): Promise<User> {
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
     return this.userService.unblockUser(userId, unblockId);
   }
 }
