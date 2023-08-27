@@ -31,8 +31,8 @@ model User {
 model Match {
     id       String   @id @default(uuid())
     score    Int[]    @default([0, 0])
-    winnerId String   @unique
-    loserId  String   @unique
+    winnerId String
+    loserId  String
     date     DateTime
 
     createdAt DateTime @default(now())

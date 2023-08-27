@@ -73,6 +73,9 @@ type Mutation {
   """Blocks a user"""
   blockUser(blockId: String!, userId: String!): User!
 
+  """Deletes a user"""
+  deleteUser(userId: String!): User!
+
   """Follows a user"""
   followUser(followId: String!, userId: String!): User!
 
@@ -109,7 +112,7 @@ type Query {
   getUserById(id: String!): User!
 
   """Retrieves a list of users by their IDs"""
-  populateIds(ids: [String!]!): [User!]!
+  populateUserIds(userIds: [String!]!): [User!]!
 }
 
 type User {
