@@ -12,6 +12,7 @@ import { UserRelationsService } from './services/user-relations.service';
  *
  * @export
  * @class UserResolver
+ * @module user
  */
 @Resolver(() => User)
 export class UserResolver {
@@ -230,5 +231,21 @@ export class UserResolver {
     if (id !== userId && !DEBUG)
       throw new ForbiddenException('User not authorized');
     return this.userRelationsService.unblockUser(userId, unblockId);
+  }
+
+  /**
+   * Mutation to delete all users (development environment only).
+   *
+   * @returns {string} A message indicating that all users were deleted.
+   * @throws {ForbiddenException} If attempted to delete users outside of the development environment.
+   */
+  @Mutation(() => String, {
+    name: 'deleteAllUsers',
+    description: 'Deletes all users in development environment',
+  })
+  deleteAllUsers(): string {
+    if (DEBUG) this.userService.deleteAllUsers();
+    else throw new ForbiddenException('User not authorized');
+    return 'All users deleted';
   }
 }

@@ -15,12 +15,34 @@ import { Request, Response } from 'express';
 import { diskStorage } from 'multer';
 
 import { Public } from 'src/auth/decorators/public.decorator';
+import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
+/**
+ * Controller for handling operations related to avatars.
+ *
+ * @export
+ * @class AvatarController
+ * @module avatar
+ */
 @Controller('/')
 export class AvatarController {
-  constructor(private userService: UserService) {}
+  /**
+   * Creates an instance of the AvatarController class.
+   *
+   * @param {UserService} userService - The user service used for resolving user-related queries.
+   */
+  constructor(private readonly userService: UserService) {}
 
+  /**
+   * Uploads an avatar for a user.
+   *
+   * @public
+   * @param {Request} req - The request object.
+   * @param {Express.Multer.File} file - The uploaded file.
+   * @returns {Promise<User>} The updated user.
+   * @throws {ForbiddenException} If the file type is not supported.
+   */
   @Public()
   @Post('upload')
   @UseInterceptors(
@@ -44,16 +66,28 @@ export class AvatarController {
       },
     }),
   )
-  uploadAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+  uploadAvatar(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<User> {
     return this.userService.updateAvatar(
       req.body.userId,
       `${process.env.BACKEND_URL}avatar/${file.filename}`,
     );
   }
 
+  /**
+   * Retrieves an avatar by its filename.
+   *
+   * @public
+   * @param {string} filename - The filename of the avatar.
+   * @param {Response} res - The response object.
+   * @returns {void}
+   * @throws {NotFoundException} If the file is not found.
+   */
   @Public()
   @Get('avatar/:filename')
-  getAvatar(@Param('filename') filename: string, @Res() res: Response) {
+  getAvatar(@Param('filename') filename: string, @Res() res: Response): void {
     try {
       return res.sendFile(filename, { root: 'uploads' });
     } catch (e) {

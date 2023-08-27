@@ -8,8 +8,20 @@ import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { userIncludes } from 'src/includes/user.includes';
 
+/**
+ * Service for managing User-related operations.
+ *
+ * @export
+ * @class UserRelationsService
+ * @module user
+ */
 @Injectable()
 export class UserRelationsService {
+  /**
+   * Creates an instance of the UserRelationsService class.
+   *
+   * @param {PrismaService} prisma - The Prisma service for database interactions.
+   */
   constructor(private readonly prisma: PrismaService) {}
 
   /**

@@ -4,7 +4,17 @@ import { MatchService } from './match.service';
 import { MatchResolver } from './match.resolver';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+/**
+ * Module for handling operations related to matches.
+ *
+ * @export
+ * @class MatchModule
+ */
 @Module({
-  providers: [MatchResolver, MatchService, PrismaService],
+  providers: [
+    MatchResolver, // Provide the Match resolver throughout the application
+    MatchService, // Provide the Match service throughout the application
+    PrismaService, // Provide the Prisma service throughout the application
+  ],
 })
 export class MatchModule {}

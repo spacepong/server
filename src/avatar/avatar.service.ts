@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
-import { PrismaService } from 'src/prisma/prisma.service';
-
+/**
+ * Service class for handling operations related to avatars.
+ *
+ * @export
+ * @class AvatarService
+ * @module avatar
+ */
 @Injectable()
 export class AvatarService {
-  constructor(private prisma: PrismaService) {}
+  /**
+   * Creates an instance of the AvatarService class.
+   */
+  constructor() {}
 }

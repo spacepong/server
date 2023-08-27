@@ -7,14 +7,20 @@ import { AvatarController } from './avatar.controller';
 import { UserService } from 'src/user/user.service';
 import { UserRelationsService } from 'src/user/services/user-relations.service';
 
+/**
+ * Module for handling operations related to avatars.
+ *
+ * @export
+ * @class AvatarModule
+ */
 @Module({
   providers: [
-    AvatarService,
-    AvatarResolver,
-    PrismaService,
-    UserService,
-    UserRelationsService,
+    AvatarService, // Provide the Avatar service throughout the application
+    AvatarResolver, // Provide the Avatar resolver throughout the application
+    PrismaService, // Provide the Prisma service throughout the application
+    UserService, // Provide the User service throughout the application
+    UserRelationsService, // Provide the UserRelations service throughout the application
   ],
-  controllers: [AvatarController],
+  controllers: [AvatarController], // Provide the Avatar controller throughout the application
 })
 export class AvatarModule {}

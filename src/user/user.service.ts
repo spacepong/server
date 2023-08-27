@@ -13,6 +13,7 @@ import { userIncludes } from 'src/includes/user.includes';
  *
  * @export
  * @class UserService
+ * @module user
  */
 @Injectable()
 export class UserService {
@@ -198,6 +199,27 @@ export class UserService {
       return deletedUser;
     } catch (e) {
       throw new ForbiddenException('Unable to delete user and associated data');
+    }
+  }
+
+  /**
+   * Deletes all users and their associated data.
+   * This is only available in the development environment.
+   *
+   * @returns {Promise<void>}
+   * @throws {ForbiddenException} If attempted to delete users outside of the development environment.
+   */
+  async deleteAllUsers(): Promise<void> {
+    try {
+      await this.prisma.$transaction([
+        this.prisma.avatar.deleteMany({}),
+        this.prisma.connection.deleteMany({}),
+        this.prisma.user.deleteMany({}),
+      ]);
+    } catch (e) {
+      throw new ForbiddenException(
+        'Unable to delete all users and associated data',
+      );
     }
   }
 }

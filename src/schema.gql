@@ -108,6 +108,9 @@ type Mutation {
   """Deletes all matches in development environment"""
   deleteAllMatches: String!
 
+  """Deletes all users in development environment"""
+  deleteAllUsers: String!
+
   """Deletes a user"""
   deleteUser(userId: String!): User!
 
