@@ -7,13 +7,13 @@ import {
 import { User } from './entities/user.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { userIncludes } from 'src/includes/user.includes';
-import { UserRelationsService } from './services/user-relations.service';
 
 /**
  * Service for managing User-related operations.
  *
  * @export
  * @class UserService
+ * @module user
  */
 @Injectable()
 export class UserService {
@@ -22,10 +22,7 @@ export class UserService {
    *
    * @param {PrismaService} prisma - The Prisma service for database interactions.
    */
-  constructor(
-    private prisma: PrismaService,
-    private userRelationsService: UserRelationsService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Retrieves all users with their associated data.
@@ -89,7 +86,7 @@ export class UserService {
    * @param {string[]} userIds - The IDs of the users to retrieve.
    * @returns {Promise<User[]>} A promise that resolves to the requested users.
    */
-  populateIds(userIds: string[]): Promise<User[]> {
+  populateUserIds(userIds: string[]): Promise<User[]> {
     return this.prisma.user.findMany({
       where: {
         id: {
@@ -162,46 +159,67 @@ export class UserService {
   }
 
   /**
-   * Follows a user.
+   * Deletes a user and their associated data.
    *
-   * @param {string} userId - The ID of the user.
-   * @param {string} followId - The ID of the user to follow.
-   * @returns {Promise<User>} A promise that resolves to the updated user.
+   * @param {string} userId - The ID of the user to delete.
+   * @returns {Promise<User>} A promise that resolves to the deleted user.
+   * @throws {ForbiddenException} If the user cannot be deleted.
    */
-  async followUser(userId: string, followId: string): Promise<User> {
-    return this.userRelationsService.followUser(userId, followId);
+  async deleteUser(userId: string): Promise<User> {
+    try {
+      /**
+       * Delete the user's avatar and connection before deleting the user.
+       * This is done to prevent orphaned data in the database.
+       */
+      const [deletedAvatarsCount, deletedConnectionsCount, deletedUser] =
+        await this.prisma.$transaction([
+          this.prisma.avatar.deleteMany({
+            where: {
+              userId,
+            },
+          }),
+          this.prisma.connection.deleteMany({
+            where: {
+              userId,
+            },
+          }),
+          this.prisma.user.delete({
+            where: {
+              id: userId,
+            },
+            include: userIncludes,
+          }),
+        ]);
+
+      if (deletedAvatarsCount.count === 0)
+        throw new ForbiddenException('Unable to delete user avatar');
+      if (deletedConnectionsCount.count === 0)
+        throw new ForbiddenException('Unable to delete user connection');
+
+      return deletedUser;
+    } catch (e) {
+      throw new ForbiddenException('Unable to delete user and associated data');
+    }
   }
 
   /**
-   * Unfollows a user.
+   * Deletes all users and their associated data.
+   * This is only available in the development environment.
    *
-   * @param {string} userId - The ID of the user.
-   * @param {string} unfollowId - The ID of the user to unfollow.
-   * @returns {Promise<User>} A promise that resolves to the updated user.
+   * @returns {Promise<void>}
+   * @throws {ForbiddenException} If attempted to delete users outside of the development environment.
    */
-  async unfollowUser(userId: string, unfollowId: string): Promise<User> {
-    return this.userRelationsService.unfollowUser(userId, unfollowId);
-  }
-
-  /**
-   * Block a user.
-   *
-   * @param {string} userId - The ID of the user.
-   * @param {string} blockId - The ID of the user to block.
-   * @returns {Promise<User>} A promise that resolves to the updated user.
-   */
-  async blockUser(userId: string, blockId: string): Promise<User> {
-    return this.userRelationsService.blockUser(userId, blockId);
-  }
-
-  /**
-   * Unblock a user.
-   *
-   * @param {string} userId - The ID of the user.
-   * @param {string} unblockId - The ID of the user to unblock.
-   * @returns {Promise<User>} A promise that resolves to the updated user.
-   */
-  async unblockUser(userId: string, unblockId: string): Promise<User> {
-    return this.userRelationsService.unblockUser(userId, unblockId);
+  async deleteAllUsers(): Promise<void> {
+    try {
+      await this.prisma.$transaction([
+        this.prisma.avatar.deleteMany({}),
+        this.prisma.connection.deleteMany({}),
+        this.prisma.user.deleteMany({}),
+      ]);
+    } catch (e) {
+      throw new ForbiddenException(
+        'Unable to delete all users and associated data',
+      );
+    }
   }
 }

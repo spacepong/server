@@ -6,6 +6,7 @@ import { IsBoolean, IsDate, IsInt, IsNotEmpty } from 'class-validator';
  *
  * @export
  * @class Connection
+ * @module connection
  */
 @ObjectType()
 export class Connection {

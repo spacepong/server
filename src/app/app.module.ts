@@ -16,6 +16,8 @@ import { ConnectionService } from 'src/connection/connection.service';
 import { UserService } from 'src/user/user.service';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { AppController } from './app.controller';
+import { MatchModule } from 'src/match/match.module';
+import { MatchService } from 'src/match/match.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -48,6 +50,9 @@ import { AppController } from './app.controller';
 
     // Import AvatarModule for avatar-related features
     AvatarModule,
+
+    // Import MatchModule for match-related features
+    MatchModule,
   ],
   providers: [
     PrismaService, // Provide Prisma service throughout the application
@@ -55,6 +60,7 @@ import { AppController } from './app.controller';
     JwtService, // Provide JWT service throughout the application
     UserService, // Provide User service throughout the application
     ConnectionService, // Provide Connection service throughout the application
+    MatchService, // Provide Match service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
   controllers: [AppController], // Provide App controller throughout the application

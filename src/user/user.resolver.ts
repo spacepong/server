@@ -5,12 +5,14 @@ import { DEBUG } from 'src/constants';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { CurrentUserId } from 'src/auth/decorators/current-userid.decorator';
+import { UserRelationsService } from './services/user-relations.service';
 
 /**
  * Resolver for handling User-related GraphQL queries.
  *
  * @export
  * @class UserResolver
+ * @module user
  */
 @Resolver(() => User)
 export class UserResolver {
@@ -18,8 +20,12 @@ export class UserResolver {
    * Creates an instance of the UserResolver class.
    *
    * @param {UserService} userService - The user service used for resolving user-related queries.
+   * @param {UserRelationsService} userRelationsService - The user relations service used for resolving user-related queries.
    */
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly userRelationsService: UserRelationsService,
+  ) {}
 
   /**
    * Query to fetch all users.
@@ -51,17 +57,17 @@ export class UserResolver {
   /**
    * Query to fetch a list of users by their IDs.
    *
-   * @param {string[]} ids - The IDs of the users.
+   * @param {string[]} userIds - The IDs of the users.
    * @returns {Promise<User[]>} The user entities.
    */
   @Query(() => [User], {
-    name: 'populateIds',
+    name: 'populateUserIds',
     description: 'Retrieves a list of users by their IDs',
   })
-  populateIds(
-    @Args('ids', { type: () => [String] }) ids: string[],
+  populateUserIds(
+    @Args('userIds', { type: () => [String] }) userIds: string[],
   ): Promise<User[]> {
-    return this.userService.populateIds(ids);
+    return this.userService.populateUserIds(userIds);
   }
 
   /**
@@ -111,6 +117,27 @@ export class UserResolver {
   }
 
   /**
+   * Mutation to delete a user.
+   *
+   * @param {string} id - The ID of the user making the request.
+   * @param {string} userId - The ID of the user.
+   * @returns {Promise<User>} The deleted user entity.
+   * @throws {ForbiddenException} If the user cannot be deleted.
+   */
+  @Mutation(() => User, {
+    name: 'deleteUser',
+    description: 'Deletes a user',
+  })
+  deleteUser(
+    @CurrentUserId() id: string,
+    @Args('userId', { type: () => String }) userId: string,
+  ): Promise<User> {
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
+    return this.userService.deleteUser(userId);
+  }
+
+  /**
    * Mutation to follow a user.
    *
    * @param {string} id - The ID of the user making the request.
@@ -131,7 +158,7 @@ export class UserResolver {
   ): Promise<User> {
     if (id !== userId && !DEBUG)
       throw new ForbiddenException('User not authorized');
-    return this.userService.followUser(userId, followId);
+    return this.userRelationsService.followUser(userId, followId);
   }
 
   /**
@@ -155,7 +182,7 @@ export class UserResolver {
   ): Promise<User> {
     if (id !== userId && !DEBUG)
       throw new ForbiddenException('User not authorized');
-    return this.userService.unfollowUser(userId, unfollowId);
+    return this.userRelationsService.unfollowUser(userId, unfollowId);
   }
 
   /**
@@ -179,7 +206,7 @@ export class UserResolver {
   ): Promise<User> {
     if (id !== userId && !DEBUG)
       throw new ForbiddenException('User not authorized');
-    return this.userService.blockUser(userId, blockId);
+    return this.userRelationsService.blockUser(userId, blockId);
   }
 
   /**
@@ -203,6 +230,22 @@ export class UserResolver {
   ): Promise<User> {
     if (id !== userId && !DEBUG)
       throw new ForbiddenException('User not authorized');
-    return this.userService.unblockUser(userId, unblockId);
+    return this.userRelationsService.unblockUser(userId, unblockId);
+  }
+
+  /**
+   * Mutation to delete all users (development environment only).
+   *
+   * @returns {string} A message indicating that all users were deleted.
+   * @throws {ForbiddenException} If attempted to delete users outside of the development environment.
+   */
+  @Mutation(() => String, {
+    name: 'deleteAllUsers',
+    description: 'Deletes all users in development environment',
+  })
+  deleteAllUsers(): string {
+    if (DEBUG) this.userService.deleteAllUsers();
+    else throw new ForbiddenException('User not authorized');
+    return 'All users deleted';
   }
 }
