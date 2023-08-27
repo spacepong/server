@@ -69,9 +69,44 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Match {
+  """The date when the match was created"""
+  createdAt: DateTime!
+
+  """The date of the match"""
+  date: DateTime!
+
+  """Unique identifier for the match"""
+  id: String!
+
+  """The loser of the match"""
+  loser: User!
+
+  """The ID of the loser"""
+  loserId: String!
+
+  """The score of the match"""
+  score: [Int!]!
+
+  """The date when the match was updated"""
+  updatedAt: DateTime!
+
+  """The winner of the match"""
+  winner: User!
+
+  """The ID of the winner"""
+  winnerId: String!
+}
+
 type Mutation {
   """Blocks a user"""
   blockUser(blockId: String!, userId: String!): User!
+
+  """Creates a new match with the given data"""
+  createMatch(newMatchInput: NewMatchInput!): Match!
+
+  """Deletes all matches in development environment"""
+  deleteAllMatches: String!
 
   """Deletes a user"""
   deleteUser(userId: String!): User!
@@ -104,12 +139,35 @@ type Mutation {
   verify2fa(token: String!, userId: String!): Auth!
 }
 
+input NewMatchInput {
+  """The ID of the loser"""
+  loserId: String!
+
+  """The score of the match"""
+  score: [Int!]!
+
+  """The ID of the winner"""
+  winnerId: String!
+}
+
 type Query {
+  """Retrieves all matches with their associated data"""
+  getAllMatches: [Match!]!
+
   """Retrieves all users with their associated data"""
   getAllUsers: [User!]!
 
+  """Retrieves a match by its ID with associated data"""
+  getMatchById(matchId: String!): Match!
+
+  """Retrieves all matches for a user by their ID"""
+  getMatchesByUserId(userId: String!): [Match!]!
+
   """Retrieves a user by their ID with associated data"""
   getUserById(id: String!): User!
+
+  """Retrieves a list of matches by their IDs"""
+  populateMatchIds(matchIds: [String!]!): [Match!]!
 
   """Retrieves a list of users by their IDs"""
   populateUserIds(userIds: [String!]!): [User!]!

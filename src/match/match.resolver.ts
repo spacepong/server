@@ -57,13 +57,14 @@ export class MatchResolver {
     return this.matchService.populateMatchIds(matchIds);
   }
 
-  @Mutation(() => [Match], {
+  @Mutation(() => String, {
     name: 'deleteAllMatches',
     description: 'Deletes all matches in development environment',
   })
-  deleteAllMatches(): void {
+  deleteAllMatches(): string {
     if (DEBUG) this.matchService.deleteAllMatches();
     else
       throw new Error('Cannot delete all matches unless in development mode');
+    return 'All matches deleted';
   }
 }

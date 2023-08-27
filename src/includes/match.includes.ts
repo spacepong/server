@@ -1,13 +1,21 @@
+import { userIncludes } from './user.includes';
+
 /**
  * Match includes for fetching match entities.
  *
  * @export
  * @constant matchIncludes
  * @type {object}
- * @property {boolean} winner - Whether to include the match's winner.
- * @property {boolean} loser - Whether to include the match's loser.
+ * @property {object} winner - The winner of the match.
+ * @property {object} winner.include - The user includes for the winner.
+ * @property {object} loser - The loser of the match.
+ * @property {object} loser.include - The user includes for the loser.
  */
 export const matchIncludes: object = {
-  winner: true,
-  loser: true,
+  winner: {
+    include: userIncludes,
+  },
+  loser: {
+    include: userIncludes,
+  },
 };

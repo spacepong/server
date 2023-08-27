@@ -1,6 +1,8 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { IsDate, IsInt, IsNotEmpty } from 'class-validator';
 
+import { User } from 'src/user/entities/user.entity';
+
 @ObjectType()
 export class Match {
   @IsNotEmpty({ message: 'Match ID must not be empty' })
@@ -16,9 +18,15 @@ export class Match {
   @Field(() => String, { description: 'The ID of the winner' })
   winnerId: string;
 
+  @Field(() => User, { description: 'The winner of the match' })
+  winner?: User;
+
   @IsNotEmpty({ message: 'Loser ID must not be empty' })
   @Field(() => String, { description: 'The ID of the loser' })
   loserId: string;
+
+  @Field(() => User, { description: 'The loser of the match' })
+  loser?: User;
 
   @IsNotEmpty({ message: 'Date must not be empty' })
   @Field(() => Date, { description: 'The date of the match' })
