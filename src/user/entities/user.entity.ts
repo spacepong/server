@@ -3,6 +3,7 @@ import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 import { Avatar } from 'src/avatar/entities/avatar.entity';
 import { Connection } from 'src/connection/entities/connection.entity';
+import { Match } from 'src/match/entities/match.entity';
 
 /**
  * Represents an individual user within the system.
@@ -87,12 +88,32 @@ export class User {
   blocked?: string[];
 
   /**
-   * The status of the user.
-   * @type {string}
+   * Last time the user was online.
+   * @type {Date}
    */
-  @IsNotEmpty({ message: 'User status must not be empty' })
-  @Field(() => String, { description: 'User status', defaultValue: 'ONLINE' })
-  status: string;
+  @IsDate({ message: 'User last online must be a date' })
+  @Field(() => Date, { description: 'Last time the user was online' })
+  lastOnline: Date;
+
+  /**
+   * The games won by the user.
+   * @type {Match[]}
+   */
+  @Field(() => [Match], {
+    description: 'Games won by the user',
+    defaultValue: [],
+  })
+  won?: Match[];
+
+  /**
+   * The games lost by the user.
+   * @type {Match[]}
+   */
+  @Field(() => [Match], {
+    description: 'Games lost by the user',
+    defaultValue: [],
+  })
+  lost?: Match[];
 
   /**
    * The date the user account was created.

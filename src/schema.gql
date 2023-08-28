@@ -195,15 +195,21 @@ type User {
   """Unique identifier for the user"""
   id: String!
 
+  """Last time the user was online"""
+  lastOnline: DateTime!
+
+  """Games lost by the user"""
+  lost: [Match!]!
+
   """User rank"""
   rank: Int!
-
-  """User status"""
-  status: String!
 
   """Date the user was last updated"""
   updatedAt: DateTime!
 
   """Username chosen by the user"""
   username: String
+
+  """Games won by the user"""
+  won: [Match!]!
 }

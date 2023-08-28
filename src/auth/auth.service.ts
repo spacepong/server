@@ -136,6 +136,7 @@ export class AuthService {
    * @param {string} intra42AccessToken - Intra42 access token.
    * @param {boolean} is2faEnabled - Whether or not 2FA is enabled for the user.
    * @param {boolean} is2faAuthenticated - Whether or not 2FA is authenticated for the user.
+   * @param {boolean} isAdmin - Whether or not the user is an admin.
    * @returns {Promise<NewAccessTokenResponse>} - The user's access token.
    */
   async createAccessToken(
@@ -143,6 +144,7 @@ export class AuthService {
     intra42AccessToken: string,
     is2faEnabled: boolean = false,
     is2faAuthenticated: boolean = false,
+    isAdmin: boolean = false,
   ): Promise<NewAccessTokenResponse> {
     /**
      * Create a new access token for the user.
@@ -152,7 +154,13 @@ export class AuthService {
      */
     return {
       accessToken: this.JwtService.sign(
-        { userId, intra42AccessToken, is2faEnabled, is2faAuthenticated },
+        {
+          userId,
+          intra42AccessToken,
+          is2faEnabled,
+          is2faAuthenticated,
+          isAdmin,
+        },
         {
           algorithm: 'HS256',
           secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
