@@ -161,9 +161,6 @@ type Mutation {
   """Generates a 2FA token for the current user"""
   generate2faToken(userId: String!, username: String!): Auth!
 
-  """Get achievements of a user."""
-  getUserAchievements(userId: String!): [UserAchievement!]!
-
   """Refreshes all users achievements"""
   refreshUsersAchievements: [Achievement!]!
 
@@ -224,6 +221,9 @@ type Query {
 
   """Retrieves all matches for a user by their ID"""
   getMatchesByUserId(userId: String!): [Match!]!
+
+  """Get achievements of a user."""
+  getUserAchievements(userId: String!): [UserAchievement!]!
 
   """Retrieves a user by their ID with associated data"""
   getUserById(id: String!): User!

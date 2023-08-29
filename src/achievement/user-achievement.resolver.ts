@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ForbiddenException } from '@nestjs/common';
 
 import { DEBUG } from 'src/constants';
@@ -26,7 +26,7 @@ export class UserAchievementResolver {
     return this.userAchievementService.createUserAchievements(userId);
   }
 
-  @Mutation(() => [UserAchievement], {
+  @Query(() => [UserAchievement], {
     name: 'getUserAchievements',
     description: 'Get achievements of a user.',
   })

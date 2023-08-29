@@ -203,11 +203,12 @@ export class AchievementService implements OnModuleInit {
   }
 
   /**
-   * Deletes all achievements from the database.
+   * Deletes all achievements from the database and all user achievements.
    *
    * @returns {Promise<void>} A Promise that resolves when all achievements are deleted.
    */
   async deleteAllAchievements(): Promise<void> {
+    await this.prisma.userAchievement.deleteMany();
     await this.prisma.achievement.deleteMany();
   }
 }

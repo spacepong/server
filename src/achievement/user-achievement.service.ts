@@ -71,7 +71,6 @@ export class UserAchievementService {
             achievedAt: isAchieved ? new Date() : null,
           },
           include: {
-            user: userIncludes,
             achievement: true,
           },
         });
