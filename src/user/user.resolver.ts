@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { CurrentUserId } from 'src/auth/decorators/current-userid.decorator';
 import { UserRelationsService } from './services/user-relations.service';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 /**
  * Resolver for handling User-related GraphQL queries.
@@ -236,6 +237,7 @@ export class UserResolver {
   /**
    * Mutation to delete all users (development environment only).
    *
+   * @param {boolean} isAdmin - Whether or not the user is an admin.
    * @returns {string} A message indicating that all users were deleted.
    * @throws {ForbiddenException} If attempted to delete users outside of the development environment.
    */
@@ -243,8 +245,8 @@ export class UserResolver {
     name: 'deleteAllUsers',
     description: 'Deletes all users in development environment',
   })
-  deleteAllUsers(): string {
-    if (DEBUG) this.userService.deleteAllUsers();
+  deleteAllUsers(@CurrentUser('isAdmin') isAdmin: boolean): string {
+    if (DEBUG && isAdmin) this.userService.deleteAllUsers();
     else throw new ForbiddenException('User not authorized');
     return 'All users deleted';
   }

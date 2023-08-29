@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { AchievementType } from '@prisma/client';
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+
+import { UserAchievement } from './user-achievement.entity';
 
 @ObjectType()
 export class Achievement {
@@ -23,9 +24,11 @@ export class Achievement {
   @Field(() => String, { description: 'Icon of the achievement' })
   icon: string;
 
-  @IsNotEmpty({ message: 'Achievement type must not be empty' })
-  @Field(() => AchievementType, { description: 'Type of the achievement' })
-  type: AchievementType;
+  @Field(() => [UserAchievement], {
+    description: 'The associated user achievement entities',
+    nullable: true,
+  })
+  users?: UserAchievement[];
 
   @IsNotEmpty({ message: 'Achievement created at must not be empty' })
   @IsDate({ message: 'Achievement created at must be a date' })

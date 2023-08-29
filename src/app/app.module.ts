@@ -18,6 +18,10 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { AppController } from './app.controller';
 import { MatchModule } from 'src/match/match.module';
 import { MatchService } from 'src/match/match.service';
+import { AchievementModule } from 'src/achievement/achievement.module';
+import { UserAchievementModule } from 'src/achievement/user-achievement.module';
+import { UserAchievementService } from 'src/achievement/user-achievement.service';
+import { AchievementService } from 'src/achievement/achievement.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -53,6 +57,12 @@ import { MatchService } from 'src/match/match.service';
 
     // Import MatchModule for match-related features
     MatchModule,
+
+    // Import AchievementModule for achievement-related features
+    AchievementModule,
+
+    // Import UserAchievementModule for user achievement-related features
+    UserAchievementModule,
   ],
   providers: [
     PrismaService, // Provide Prisma service throughout the application
@@ -61,6 +71,8 @@ import { MatchService } from 'src/match/match.service';
     UserService, // Provide User service throughout the application
     ConnectionService, // Provide Connection service throughout the application
     MatchService, // Provide Match service throughout the application
+    AchievementService, // Provide Achievement service throughout the application
+    UserAchievementService, // Provide UserAchievement service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
   controllers: [AppController], // Provide App controller throughout the application

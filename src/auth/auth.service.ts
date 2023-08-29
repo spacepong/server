@@ -12,6 +12,7 @@ import { SignResponse } from './dto/sign.response';
 import { userIncludes } from 'src/includes/user.includes';
 import { UserService } from 'src/user/user.service';
 import { SignIn2faInput } from './dto/signin-2fa.input';
+import { UserAchievementService } from 'src/achievement/user-achievement.service';
 
 /**
  * Service responsible for authentication-related functionality.
@@ -28,12 +29,14 @@ export class AuthService {
    * @param {ConfigService} configService - The configuration service for accessing application configuration.
    * @param {JwtService} JwtService - The JWT service for generating and verifying tokens.
    * @param {UserService} userService - The user service for interacting with user-related data.
+   * @param {UserAchievementService} userAchievementService - The user achievement service for interacting with user achievement-related data.
    */
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly JwtService: JwtService,
     private readonly userService: UserService,
+    private readonly userAchievementService: UserAchievementService,
   ) {}
 
   /**
@@ -81,6 +84,15 @@ export class AuthService {
       throw new InternalServerErrorException('Unable to retrieve user');
 
     /**
+     * Create user achievements for the user.
+     * If the user already has achievements, this is skipped.
+     */
+    if (user.achievements.length === 0)
+      try {
+        await this.userAchievementService.createUserAchievements(user.id);
+      } catch (e) {}
+
+    /**
      * Create a new access token for the user.
      * Return the access token and the user data.
      */
@@ -89,6 +101,8 @@ export class AuthService {
         user.id,
         signInInput.accessToken,
         user.connection.is2faEnabled,
+        false,
+        user.isAdmin,
       ).then((response: NewAccessTokenResponse) => response.accessToken),
       intra42AccessToken: signInInput.accessToken,
       intra42RefreshToken: signInInput.refreshToken,

@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller';
 import { UserService } from 'src/user/user.service';
 import { UserRelationsService } from 'src/user/services/user-relations.service';
 import { Auth2faService } from './services/auth-2fa.service';
+import { UserAchievementService } from 'src/achievement/user-achievement.service';
 
 /**
  * Module for handling authentication-related functionality.
@@ -31,6 +32,7 @@ import { Auth2faService } from './services/auth-2fa.service';
     UserService, // Service for handling user-related functionality
     UserRelationsService, // Service for handling user relations (follows, block, etc.)
     Intra42Strategy, // Passport strategy for authenticating with 42 intra
+    UserAchievementService, // Service for handling user achievement-related functionality
   ],
   exports: [Auth2faService], // Export Auth2faService to be used in other modules
 })

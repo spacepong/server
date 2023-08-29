@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ForbiddenException } from '@nestjs/common';
 
 import { AchievementService } from './achievement.service';
@@ -44,11 +44,32 @@ export class AchievementResolver {
   }
 
   /**
-   * Mutation to get all achievements.
+   * Mutation to refresh all users achievements.
+   *
+   * @param {boolean} isAdmin - Whether the user is an admin.
+   * @returns {Promise<Achievement[]>} A list of refreshed achievements.
+   * @throws {ForbiddenException} If the user is not authorized.
+   */
+  @Mutation(() => [Achievement], {
+    name: 'refreshUsersAchievements',
+    description: 'Refreshes all users achievements',
+  })
+  async refreshUsersAchievements(
+    @CurrentUser('isAdmin') isAdmin: boolean,
+  ): Promise<Achievement[]> {
+    if (!isAdmin)
+      throw new ForbiddenException(
+        'User not authorized to refresh achievements',
+      );
+    return this.achievementService.refreshUsersAchievements();
+  }
+
+  /**
+   * Query to get all achievements.
    *
    * @returns {Promise<Achievement[]>} A list of all achievements.
    */
-  @Mutation(() => [Achievement], {
+  @Query(() => [Achievement], {
     name: 'getAllAchievements',
     description: 'Gets all achievements',
   })
@@ -57,12 +78,12 @@ export class AchievementResolver {
   }
 
   /**
-   * Mutation to get an achievement by its ID.
+   * Query to get an achievement by its ID.
    *
    * @param {string} achievementId - The ID of the achievement.
    * @returns {Promise<Achievement>} The retrieved achievement.
    */
-  @Mutation(() => Achievement, {
+  @Query(() => Achievement, {
     name: 'getAchievementById',
     description: 'Gets an achievement by ID',
   })

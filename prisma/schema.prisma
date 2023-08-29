@@ -10,16 +10,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-enum AchievementType {
-    WIN_MATCH
-    LOSE_MATCH
-    REACH_RANK_1
-    REACH_RANK_2
-    REACH_RANK_3
-    REACH_RANK_4
-    REACH_RANK_5
-}
-
 model User {
     id           String            @id @default(uuid())
     connection   Connection?
@@ -91,7 +81,6 @@ model Achievement {
     name        String            @unique
     description String
     icon        String            @unique
-    type        AchievementType   @unique
     users       UserAchievement[]
 
     createdAt DateTime @default(now())
@@ -113,5 +102,6 @@ model UserAchievement {
     achievement Achievement @relation(fields: [achievementId], references: [id])
     user        User        @relation(fields: [userId], references: [id])
 
+    @@unique([userId, achievementId])
     @@map("user_achievements")
 }

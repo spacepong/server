@@ -1,5 +1,12 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
+import { UserAchievement } from 'src/achievement/entities/user-achievement.entity';
 
 import { Avatar } from 'src/avatar/entities/avatar.entity';
 import { Connection } from 'src/connection/entities/connection.entity';
@@ -55,6 +62,19 @@ export class User {
     nullable: true,
   })
   username?: string;
+
+  /**
+   * Whether or not the user is an admin.
+   * @type {boolean}
+   * @default false
+   */
+  @IsNotEmpty({ message: 'User is admin must not be empty' })
+  @IsBoolean({ message: 'User is admin must be a boolean' })
+  @Field(() => Boolean, {
+    description: 'Whether or not the user is an admin',
+    defaultValue: false,
+  })
+  isAdmin: boolean;
 
   /**
    * The rank of the user.
@@ -114,6 +134,16 @@ export class User {
     defaultValue: [],
   })
   lost?: Match[];
+
+  /**
+   * The achievements of the user.
+   * @type {UserAchievement[]}
+   */
+  @Field(() => [UserAchievement], {
+    description: 'Achievements of the user',
+    defaultValue: [],
+  })
+  achievements?: UserAchievement[];
 
   /**
    * The date the user account was created.
