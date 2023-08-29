@@ -11,16 +11,18 @@ datasource db {
 }
 
 model User {
-    id         String      @id @default(uuid())
-    connection Connection?
-    avatar     Avatar?
-    username   String?     @unique
-    rank       Int         @default(100)
-    following  String[]    @default([])
-    blocked    String[]    @default([])
-    status     String      @default("ONLINE")
-    won        Match[]     @relation("WonMatch")
-    lost       Match[]     @relation("LostMatch")
+    id           String            @id @default(uuid())
+    connection   Connection?
+    avatar       Avatar?
+    username     String?           @unique
+    isAdmin      Boolean           @default(false)
+    rank         Int               @default(100)
+    following    String[]          @default([])
+    blocked      String[]          @default([])
+    lastOnline   DateTime          @default(now())
+    won          Match[]           @relation("WonMatch")
+    lost         Match[]           @relation("LostMatch")
+    achievements UserAchievement[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -72,4 +74,34 @@ model Avatar {
     user User @relation(fields: [userId], references: [id])
 
     @@map("avatars")
+}
+
+model Achievement {
+    id          String            @id @default(uuid())
+    name        String            @unique
+    description String
+    icon        String            @unique
+    users       UserAchievement[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("achievements")
+}
+
+model UserAchievement {
+    id            String    @id @default(uuid())
+    userId        String
+    achievementId String
+    isAchieved    Boolean   @default(false)
+    achievedAt    DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    achievement Achievement @relation(fields: [achievementId], references: [id])
+    user        User        @relation(fields: [userId], references: [id])
+
+    @@unique([userId, achievementId])
+    @@map("user_achievements")
 }

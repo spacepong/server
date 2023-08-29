@@ -25,7 +25,7 @@ import { UserService } from 'src/user/user.service';
  * @class AvatarController
  * @module avatar
  */
-@Controller('/')
+@Controller('avatar')
 export class AvatarController {
   /**
    * Creates an instance of the AvatarController class.
@@ -86,7 +86,7 @@ export class AvatarController {
    * @throws {NotFoundException} If the file is not found.
    */
   @Public()
-  @Get('avatar/:filename')
+  @Get(':filename')
   getAvatar(@Param('filename') filename: string, @Res() res: Response): void {
     try {
       return res.sendFile(filename, { root: 'uploads' });

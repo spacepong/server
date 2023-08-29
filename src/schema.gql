@@ -2,6 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Achievement {
+  """Date the achievement was created"""
+  createdAt: DateTime!
+
+  """Description of the achievement"""
+  description: String!
+
+  """Icon of the achievement"""
+  icon: String!
+
+  """Unique identifier for the achievement"""
+  id: String!
+
+  """Name of the achievement"""
+  name: String!
+
+  """Date the achievement was updated"""
+  updatedAt: DateTime!
+
+  """The associated user achievement entities"""
+  users: [UserAchievement!]
+}
+
 type Auth {
   """The 2FA validation"""
   is2faValid: Boolean
@@ -32,6 +55,9 @@ type Avatar {
   """The date when the avatar was last updated"""
   updatedAt: DateTime!
 
+  """The associated user entity"""
+  user: User
+
   """The ID of the associated user"""
   userId: String!
 }
@@ -59,6 +85,9 @@ type Connection {
 
   """The date when the connection was last updated"""
   updatedAt: DateTime!
+
+  """The associated user entity"""
+  user: User
 
   """The ID of the associated user"""
   userId: String!
@@ -102,8 +131,20 @@ type Mutation {
   """Blocks a user"""
   blockUser(blockId: String!, userId: String!): User!
 
+  """Creates all achievements"""
+  createAchievements: [Achievement!]!
+
   """Creates a new match with the given data"""
   createMatch(newMatchInput: NewMatchInput!): Match!
+
+  """Create user achievements for a user."""
+  createUserAchievements(userId: String!): User!
+
+  """Deletes an achievement"""
+  deleteAchievement(achievementId: String!): Achievement!
+
+  """Deletes all achievements"""
+  deleteAllAchievements: String!
 
   """Deletes all matches in development environment"""
   deleteAllMatches: String!
@@ -120,6 +161,9 @@ type Mutation {
   """Generates a 2FA token for the current user"""
   generate2faToken(userId: String!, username: String!): Auth!
 
+  """Refreshes all users achievements"""
+  refreshUsersAchievements: [Achievement!]!
+
   """Turns off 2FA for the current user"""
   turnOff2fa(token: String!, userId: String!): Auth!
 
@@ -132,8 +176,14 @@ type Mutation {
   """Unfollows a user"""
   unfollowUser(unfollowId: String!, userId: String!): User!
 
+  """Updates an achievement"""
+  updateAchievement(achievementId: String!, updateAchievementInput: UpdateAchievementInput!): Achievement!
+
   """Updates the avatar of a user"""
   updateAvatar(avatar: String!, userId: String!): User!
+
+  """Update an achievement of a user."""
+  updateUserAchievement(achievementId: String!, isAchieved: Boolean!, userId: String!): UserAchievement!
 
   """Updates the username of a user"""
   updateUsername(userId: String!, username: String!): User!
@@ -154,6 +204,12 @@ input NewMatchInput {
 }
 
 type Query {
+  """Gets an achievement by ID"""
+  getAchievementById(achievementId: String!): Achievement!
+
+  """Gets all achievements"""
+  getAllAchievements: [Achievement!]!
+
   """Retrieves all matches with their associated data"""
   getAllMatches: [Match!]!
 
@@ -166,6 +222,9 @@ type Query {
   """Retrieves all matches for a user by their ID"""
   getMatchesByUserId(userId: String!): [Match!]!
 
+  """Get achievements of a user."""
+  getUserAchievements(userId: String!): [UserAchievement!]!
+
   """Retrieves a user by their ID with associated data"""
   getUserById(id: String!): User!
 
@@ -176,7 +235,21 @@ type Query {
   populateUserIds(userIds: [String!]!): [User!]!
 }
 
+input UpdateAchievementInput {
+  """Achievement description"""
+  description: String
+
+  """Achievement icon"""
+  icon: String
+
+  """Achievement name"""
+  name: String
+}
+
 type User {
+  """Achievements of the user"""
+  achievements: [UserAchievement!]!
+
   """The associated avatar entity"""
   avatar: Avatar
 
@@ -195,15 +268,53 @@ type User {
   """Unique identifier for the user"""
   id: String!
 
+  """Whether or not the user is an admin"""
+  isAdmin: Boolean!
+
+  """Last time the user was online"""
+  lastOnline: DateTime!
+
+  """Games lost by the user"""
+  lost: [Match!]!
+
   """User rank"""
   rank: Int!
-
-  """User status"""
-  status: String!
 
   """Date the user was last updated"""
   updatedAt: DateTime!
 
   """Username chosen by the user"""
   username: String
+
+  """Games won by the user"""
+  won: [Match!]!
+}
+
+type UserAchievement {
+  """Date the user achievement was achieved"""
+  achievedAt: DateTime
+
+  """The associated achievement entity"""
+  achievement: Achievement
+
+  """Unique identifier for the achievement"""
+  achievementId: String!
+
+  """Date the user achievement was created"""
+  createdAt: DateTime!
+
+  """Unique identifier for the user achievement"""
+  id: String!
+
+  """Whether the user achievement is achieved"""
+  isAchieved: Boolean!
+
+  """Date the user achievement was updated"""
+  updatedAt: DateTime!
+
+  """The associated user entity"""
+  user: User
+
+  """Unique identifier for the user"""
+  userId: String!
 }

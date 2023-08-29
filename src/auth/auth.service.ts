@@ -12,6 +12,7 @@ import { SignResponse } from './dto/sign.response';
 import { userIncludes } from 'src/includes/user.includes';
 import { UserService } from 'src/user/user.service';
 import { SignIn2faInput } from './dto/signin-2fa.input';
+import { UserAchievementService } from 'src/achievement/user-achievement.service';
 
 /**
  * Service responsible for authentication-related functionality.
@@ -28,12 +29,14 @@ export class AuthService {
    * @param {ConfigService} configService - The configuration service for accessing application configuration.
    * @param {JwtService} JwtService - The JWT service for generating and verifying tokens.
    * @param {UserService} userService - The user service for interacting with user-related data.
+   * @param {UserAchievementService} userAchievementService - The user achievement service for interacting with user achievement-related data.
    */
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly JwtService: JwtService,
     private readonly userService: UserService,
+    private readonly userAchievementService: UserAchievementService,
   ) {}
 
   /**
@@ -81,6 +84,15 @@ export class AuthService {
       throw new InternalServerErrorException('Unable to retrieve user');
 
     /**
+     * Create user achievements for the user.
+     * If the user already has achievements, this is skipped.
+     */
+    if (user.achievements.length === 0)
+      try {
+        await this.userAchievementService.createUserAchievements(user.id);
+      } catch (e) {}
+
+    /**
      * Create a new access token for the user.
      * Return the access token and the user data.
      */
@@ -89,6 +101,8 @@ export class AuthService {
         user.id,
         signInInput.accessToken,
         user.connection.is2faEnabled,
+        false,
+        user.isAdmin,
       ).then((response: NewAccessTokenResponse) => response.accessToken),
       intra42AccessToken: signInInput.accessToken,
       intra42RefreshToken: signInInput.refreshToken,
@@ -136,6 +150,7 @@ export class AuthService {
    * @param {string} intra42AccessToken - Intra42 access token.
    * @param {boolean} is2faEnabled - Whether or not 2FA is enabled for the user.
    * @param {boolean} is2faAuthenticated - Whether or not 2FA is authenticated for the user.
+   * @param {boolean} isAdmin - Whether or not the user is an admin.
    * @returns {Promise<NewAccessTokenResponse>} - The user's access token.
    */
   async createAccessToken(
@@ -143,6 +158,7 @@ export class AuthService {
     intra42AccessToken: string,
     is2faEnabled: boolean = false,
     is2faAuthenticated: boolean = false,
+    isAdmin: boolean = false,
   ): Promise<NewAccessTokenResponse> {
     /**
      * Create a new access token for the user.
@@ -152,7 +168,13 @@ export class AuthService {
      */
     return {
       accessToken: this.JwtService.sign(
-        { userId, intra42AccessToken, is2faEnabled, is2faAuthenticated },
+        {
+          userId,
+          intra42AccessToken,
+          is2faEnabled,
+          is2faAuthenticated,
+          isAdmin,
+        },
         {
           algorithm: 'HS256',
           secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
