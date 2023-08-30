@@ -23,6 +23,10 @@ model User {
     won          Match[]           @relation("WonMatch")
     lost         Match[]           @relation("LostMatch")
     achievements UserAchievement[]
+    channels     Channel[]
+    messages     Message[]
+    kicks        Kick[]
+    mutes        Mute[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -104,4 +108,67 @@ model UserAchievement {
 
     @@unique([userId, achievementId])
     @@map("user_achievements")
+}
+
+model Channel {
+    id          String    @id @default(uuid())
+    name        String    @unique
+    description String?
+    type        String    @default("DIRECT") // PUBLIC, PRIVATE, PROTECTED, DIRECT
+    password    String?
+    ownerId     String
+    adminIds    String[]
+    mutes       Mute[]
+    kicks       Kick[]
+    users       User[]
+    messages    Message[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("channels")
+}
+
+model Message {
+    id        String   @id @default(uuid())
+    channelId String
+    userId    String
+    content   String
+    unsent    Boolean  @default(false)
+    seenBy    String[] @default([])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    channel Channel @relation(fields: [channelId], references: [id])
+    user    User    @relation(fields: [userId], references: [id])
+
+    @@map("messages")
+}
+
+model Mute {
+    id        String   @id @default(uuid())
+    channelId String
+    userId    String
+    duration  Int
+    reason    String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    channel Channel @relation(fields: [channelId], references: [id])
+    user    User    @relation(fields: [userId], references: [id])
+
+    @@map("mutes")
+}
+
+model Kick {
+    id        String   @id @default(uuid())
+    channelId String
+    userId    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    channel Channel @relation(fields: [channelId], references: [id])
+    user    User    @relation(fields: [userId], references: [id])
+
+    @@map("kicks")
 }
