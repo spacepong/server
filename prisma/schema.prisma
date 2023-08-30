@@ -116,7 +116,7 @@ model Channel {
     description String?
     type        String    @default("DIRECT") // PUBLIC, PRIVATE, PROTECTED, DIRECT
     password    String?
-    ownerId     String
+    ownerId     String?
     adminIds    String[]
     mutes       Mute[]
     kicks       Kick[]
@@ -133,7 +133,9 @@ model Message {
     id        String   @id @default(uuid())
     channelId String
     userId    String
-    content   String
+    text      String?
+    photo     String?
+    invite    String?
     unsent    Boolean  @default(false)
     seenBy    String[] @default([])
     createdAt DateTime @default(now())
