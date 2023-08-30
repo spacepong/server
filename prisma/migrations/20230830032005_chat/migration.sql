@@ -45,6 +45,7 @@ CREATE TABLE "kicks" (
     "id" TEXT NOT NULL,
     "channelId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "reason" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

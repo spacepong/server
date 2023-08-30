@@ -22,6 +22,10 @@ import { AchievementModule } from 'src/achievement/achievement.module';
 import { UserAchievementModule } from 'src/achievement/user-achievement.module';
 import { UserAchievementService } from 'src/achievement/user-achievement.service';
 import { AchievementService } from 'src/achievement/achievement.service';
+import { ChannelModule } from 'src/channel/channel.module';
+import { MessageModule } from 'src/message/message.module';
+import { MuteModule } from 'src/mute/mute.module';
+import { KickModule } from 'src/kick/kick.module';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -63,6 +67,18 @@ import { AchievementService } from 'src/achievement/achievement.service';
 
     // Import UserAchievementModule for user achievement-related features
     UserAchievementModule,
+
+    /**
+     * Import the following modules for channel-related features:
+     * - ChannelModule: Channel-related features (e.g. CRUD operations)
+     * - MessageModule: Message-related operations
+     * - MuteModule: Channel mute-related operations
+     * - KickModule: Channel kick-related operations
+     */
+    ChannelModule,
+    MessageModule,
+    MuteModule,
+    KickModule,
   ],
   providers: [
     PrismaService, // Provide Prisma service throughout the application
