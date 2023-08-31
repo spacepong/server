@@ -8,19 +8,18 @@ import { Message } from 'src/message/entities/message.entity';
 
 /**
  * Represents the type of a channel.
- * @export
- * @enum {string}
- * @property {string} PUBLIC 'PUBLIC' - A public channel.
- * @property {string} PRIVATE 'PRIVATE' - A private channel.
- * @property {string} PROTECTED 'PROTECTED' - A protected channel.
- * @property {string} DIRECT 'DIRECT' - A direct channel.
+ * @type {object}
+ * @property {string} PUBLIC - A public channel (no restrictions).
+ * @property {string} PRIVATE - A private channel (requires invite).
+ * @property {string} PROTECTED - A protected channel (requires password).
+ * @property {string} DIRECT - A direct channel (between two users).
  */
-export enum ChannelType {
-  PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE',
-  PROTECTED = 'PROTECTED',
-  DIRECT = 'DIRECT',
-}
+export const ChannelType: object = {
+  PUBLIC: 'PUBLIC',
+  PRIVATE: 'PRIVATE',
+  PROTECTED: 'PROTECTED',
+  DIRECT: 'DIRECT',
+};
 
 /**
  * Represents an individual channel within the system.
@@ -43,10 +42,12 @@ export class Channel {
    * The name of the channel.
    * @type {string}
    */
-  @IsNotEmpty({ message: 'Channel name must not be empty' })
   @IsString({ message: 'Channel name must be a string' })
-  @Field(() => String, { description: 'Name of the channel' })
-  name: string;
+  @Field(() => String, {
+    description: 'Name of the channel',
+    nullable: true,
+  })
+  name?: string;
 
   /**
    * The description of the channel.
@@ -61,13 +62,13 @@ export class Channel {
 
   /**
    * The type of the channel.
-   * @type {ChannelType}
+   * @type {string}
    */
   @IsNotEmpty({ message: 'Channel type must not be empty' })
-  @Field(() => ChannelType, {
+  @Field(() => String, {
     description: 'Type of the channel',
   })
-  type: ChannelType;
+  type: string;
 
   /**
    * The hashed password of the channel (if applicable).
@@ -113,7 +114,7 @@ export class Channel {
     description: 'Mutes associated with the channel',
     defaultValue: [],
   })
-  mutes: Mute[];
+  mutes?: Mute[];
 
   /**
    * The kicked users of the channel.
@@ -124,19 +125,18 @@ export class Channel {
     description: 'Kicks associated with the channel',
     defaultValue: [],
   })
-  kicks: Kick[];
+  kicks?: Kick[];
 
   /**
    * The members of the channel.
    * @type {User[]}
    * @default []
    */
-  @IsNotEmpty({ message: 'Channel users must not be empty' })
   @Field(() => [User], {
     description: 'Members of the channel',
     defaultValue: [],
   })
-  users: User[];
+  users?: User[];
 
   /**
    * The messages of the channel.
@@ -147,7 +147,7 @@ export class Channel {
     description: 'Messages associated with the channel',
     defaultValue: [],
   })
-  messages: Message[];
+  messages?: Message[];
 
   /**
    * The date the channel was created.

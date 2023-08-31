@@ -1,12 +1,12 @@
 -- CreateTable
 CREATE TABLE "channels" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" TEXT,
     "description" TEXT,
     "type" TEXT NOT NULL DEFAULT 'DIRECT',
     "password" TEXT,
     "ownerId" TEXT,
-    "adminIds" TEXT[],
+    "adminIds" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -59,9 +59,6 @@ CREATE TABLE "_ChannelToUser" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "channels_name_key" ON "channels"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ChannelToUser_AB_unique" ON "_ChannelToUser"("A", "B");

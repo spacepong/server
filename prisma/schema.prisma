@@ -112,12 +112,12 @@ model UserAchievement {
 
 model Channel {
     id          String    @id @default(uuid())
-    name        String    @unique
+    name        String?
     description String?
-    type        String    @default("DIRECT") // PUBLIC, PRIVATE, PROTECTED, DIRECT
+    type        String    @default("DIRECT")
     password    String?
     ownerId     String?
-    adminIds    String[]
+    adminIds    String[]  @default([])
     mutes       Mute[]
     kicks       Kick[]
     users       User[]

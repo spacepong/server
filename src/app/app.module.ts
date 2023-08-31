@@ -26,6 +26,10 @@ import { ChannelModule } from 'src/channel/channel.module';
 import { MessageModule } from 'src/message/message.module';
 import { MuteModule } from 'src/mute/mute.module';
 import { KickModule } from 'src/kick/kick.module';
+import { ChannelService } from 'src/channel/channel.service';
+import { MessageService } from 'src/message/message.service';
+import { MuteService } from 'src/mute/mute.service';
+import { KickService } from 'src/kick/kick.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -89,6 +93,10 @@ import { KickModule } from 'src/kick/kick.module';
     MatchService, // Provide Match service throughout the application
     AchievementService, // Provide Achievement service throughout the application
     UserAchievementService, // Provide UserAchievement service throughout the application
+    ChannelService, // Provide Channel service throughout the application
+    MessageService, // Provide Message service throughout the application
+    MuteService, // Provide Mute service throughout the application
+    KickService, // Provide Kick service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
   controllers: [AppController], // Provide App controller throughout the application
