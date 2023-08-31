@@ -272,6 +272,9 @@ type Mutation {
   """Generates a 2FA token for the current user"""
   generate2faToken(userId: String!, username: String!): Auth!
 
+  """Join a public channel"""
+  joinPublicChannel(channelId: String!, userId: String!): Channel!
+
   """Refreshes all users achievements"""
   refreshUsersAchievements: [Achievement!]!
 
@@ -370,11 +373,32 @@ type Query {
   """Gets all achievements"""
   getAllAchievements: [Achievement!]!
 
+  """Get all channels"""
+  getAllChannels: [Channel!]!
+
+  """Get all direct channels"""
+  getAllDirectChannels: [Channel!]!
+
   """Retrieves all matches with their associated data"""
   getAllMatches: [Match!]!
 
+  """Get all private channels"""
+  getAllPrivateChannels: [Channel!]!
+
+  """Get all protected channels"""
+  getAllProtectedChannels: [Channel!]!
+
+  """Get all public channels"""
+  getAllPublicChannels: [Channel!]!
+
   """Retrieves all users with their associated data"""
   getAllUsers: [User!]!
+
+  """Get a channel by its ID"""
+  getChannelById(channelId: String!): Channel!
+
+  """Get all channels of a user ordered by most recent"""
+  getChannelsByUserId(userId: String!): [Channel!]!
 
   """Retrieves a match by its ID with associated data"""
   getMatchById(matchId: String!): Match!

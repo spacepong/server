@@ -2,6 +2,7 @@ import {
   Injectable,
   ForbiddenException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 
 import * as argon from 'argon2';
@@ -198,7 +199,109 @@ export class ChannelService {
     }
   }
 
-  async getAllChannels() {
-    return await this.prismaService.channel.findMany();
+  getAllChannels() {
+    return this.prismaService.channel.findMany({
+      include: channelIncludes,
+    });
+  }
+
+  getAllPublicChannels() {
+    return this.prismaService.channel.findMany({
+      where: {
+        type: 'PUBLIC',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: channelIncludes,
+    });
+  }
+
+  getAllPrivateChannels() {
+    return this.prismaService.channel.findMany({
+      where: {
+        type: 'PRIVATE',
+      },
+      include: channelIncludes,
+    });
+  }
+
+  getAllProtectedChannels() {
+    return this.prismaService.channel.findMany({
+      where: {
+        type: 'PROTECTED',
+      },
+      include: channelIncludes,
+    });
+  }
+
+  getAllDirectChannels() {
+    return this.prismaService.channel.findMany({
+      where: {
+        type: 'DIRECT',
+      },
+      include: channelIncludes,
+    });
+  }
+
+  getChannelById(channelId: string) {
+    return this.prismaService.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: channelIncludes,
+    });
+  }
+
+  getChannelsByUserId(userId: string) {
+    return this.prismaService.channel.findMany({
+      where: {
+        users: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      include: channelIncludes,
+    });
+  }
+
+  async joinPublicChannel(channelId: string, userId: string) {
+    const channel: Channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: channelIncludes,
+    });
+
+    if (!channel) throw new NotFoundException('Channel not found');
+
+    if (channel.type !== 'PUBLIC')
+      throw new ForbiddenException('Channel is not public');
+
+    if (channel.users.some((user) => user.id === userId))
+      throw new ForbiddenException('User already in channel');
+
+    try {
+      const channelJoined: Channel = await this.prismaService.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          users: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+        include: channelIncludes,
+      });
+      return channelJoined;
+    } catch (e) {
+      throw new InternalServerErrorException('Error joining channel');
+    }
   }
 }
