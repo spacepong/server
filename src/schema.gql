@@ -72,6 +72,9 @@ type Channel {
   """Description of the channel"""
   description: String
 
+  """Unique identifier for the channel first owner"""
+  firstOwnerId: String
+
   """Unique identifier for the channel"""
   id: String!
 

@@ -4,6 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 
+import * as argon from 'argon2';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NewChannelInput } from './dto/new-channel.input';
 import { Channel, ChannelType } from './entities/channel.entity';
@@ -13,6 +15,34 @@ import { randomChannelName } from './utils/random-channel-name';
 @Injectable()
 export class ChannelService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  static async didUserAlreadyCreatedChannel(
+    newChannelInput: NewChannelInput,
+    prismaService: PrismaService,
+  ) {
+    const didUserAlreadyCreatedChannel: Channel =
+      await prismaService.channel.findFirst({
+        where: {
+          AND: [
+            {
+              type: newChannelInput.type,
+            },
+            {
+              firstOwnerId: newChannelInput.ownerId,
+            },
+            {
+              createdAt: { gt: new Date(Date.now() - 1000 * 60 * 60 * 24) },
+            },
+          ],
+        },
+        include: channelIncludes,
+      });
+
+    if (didUserAlreadyCreatedChannel)
+      throw new ForbiddenException(
+        `User already created a ${newChannelInput.type.toLowerCase()} channel in the last 24 hours`,
+      );
+  }
 
   async createChannel(newChannelInput: NewChannelInput): Promise<Channel> {
     if (!ChannelType[newChannelInput.type])
@@ -58,33 +88,15 @@ export class ChannelService {
         throw new InternalServerErrorException('Error creating channel');
       }
     } else if (newChannelInput.type === 'PUBLIC') {
-      if (newChannelInput.userIds.length !== 1)
+      if (newChannelInput.userIds.length > 30)
         throw new ForbiddenException(
-          'Public channels must have exactly one user during creation',
+          'Public channels must have 30 or fewer users',
         );
 
-      const isUserAlreadyCreatedPublicChannel: Channel =
-        await this.prismaService.channel.findFirst({
-          where: {
-            AND: [
-              {
-                type: newChannelInput.type,
-              },
-              {
-                ownerId: newChannelInput.ownerId,
-              },
-              {
-                createdAt: { gt: new Date(Date.now() - 1000 * 60 * 60 * 24) },
-              },
-            ],
-          },
-          include: channelIncludes,
-        });
-
-      if (isUserAlreadyCreatedPublicChannel)
-        throw new ForbiddenException(
-          'User already created a public channel in the last 24 hours',
-        );
+      await ChannelService.didUserAlreadyCreatedChannel(
+        newChannelInput,
+        this.prismaService,
+      );
 
       try {
         const publicChannel: Channel = await this.prismaService.channel.create({
@@ -92,6 +104,7 @@ export class ChannelService {
             type: newChannelInput.type,
             name: newChannelInput.name || randomChannelName(),
             description: newChannelInput.description || 'A public channel',
+            firstOwnerId: newChannelInput.ownerId,
             ownerId: newChannelInput.ownerId,
             adminIds: [newChannelInput.ownerId],
             users: {
@@ -107,7 +120,81 @@ export class ChannelService {
         throw new InternalServerErrorException('Error creating channel');
       }
     } else if (newChannelInput.type === 'PRIVATE') {
+      if (newChannelInput.userIds.length > 20)
+        throw new ForbiddenException(
+          'Private channels must have 20 or fewer users',
+        );
+
+      await ChannelService.didUserAlreadyCreatedChannel(
+        newChannelInput,
+        this.prismaService,
+      );
+
+      try {
+        const privateChannel: Channel = await this.prismaService.channel.create(
+          {
+            data: {
+              type: newChannelInput.type,
+              name: newChannelInput.name || randomChannelName(),
+              description: newChannelInput.description || 'A private channel',
+              firstOwnerId: newChannelInput.ownerId,
+              ownerId: newChannelInput.ownerId,
+              adminIds: [newChannelInput.ownerId],
+              users: {
+                connect: newChannelInput.userIds.map((userId: string) => ({
+                  id: userId,
+                })),
+              },
+            },
+            include: channelIncludes,
+          },
+        );
+        return privateChannel;
+      } catch (e) {
+        throw new InternalServerErrorException('Error creating channel');
+      }
     } else if (newChannelInput.type === 'PROTECTED') {
+      if (newChannelInput.userIds.length > 20)
+        throw new ForbiddenException(
+          'Protected channels must have 20 or fewer users',
+        );
+
+      if (!newChannelInput.password || newChannelInput.password.length < 8)
+        throw new ForbiddenException(
+          'Protected channels must have a password of at least 8 characters',
+        );
+
+      await ChannelService.didUserAlreadyCreatedChannel(
+        newChannelInput,
+        this.prismaService,
+      );
+
+      try {
+        const hashedPassword: string = await argon.hash(
+          newChannelInput.password,
+        );
+        const protectedChannel: Channel =
+          await this.prismaService.channel.create({
+            data: {
+              type: newChannelInput.type,
+              name: newChannelInput.name || randomChannelName(),
+              description: newChannelInput.description || 'A protected channel',
+              password: hashedPassword,
+              firstOwnerId: newChannelInput.ownerId,
+              ownerId: newChannelInput.ownerId,
+              adminIds: [newChannelInput.ownerId],
+              users: {
+                connect: newChannelInput.userIds.map((userId: string) => ({
+                  id: userId,
+                })),
+              },
+            },
+            include: channelIncludes,
+          });
+        return protectedChannel;
+      } catch (e) {
+        throw new InternalServerErrorException('Error creating channel');
+      }
     }
   }
 

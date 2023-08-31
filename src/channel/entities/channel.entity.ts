@@ -83,6 +83,18 @@ export class Channel {
   password?: string;
 
   /**
+   * The first owner of the channel (who created it).
+   * @type {string}
+   */
+  @IsNotEmpty({ message: 'Channel first owner ID must not be empty' })
+  @IsString({ message: 'Channel first owner ID must be a string' })
+  @Field(() => String, {
+    description: 'Unique identifier for the channel first owner',
+    nullable: true,
+  })
+  firstOwnerId?: string;
+
+  /**
    * The owner of the channel.
    * @type {string}
    */

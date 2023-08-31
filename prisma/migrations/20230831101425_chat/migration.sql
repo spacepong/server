@@ -5,6 +5,7 @@ CREATE TABLE "channels" (
     "description" TEXT,
     "type" TEXT NOT NULL DEFAULT 'DIRECT',
     "password" TEXT,
+    "firstOwnerId" TEXT,
     "ownerId" TEXT,
     "adminIds" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
