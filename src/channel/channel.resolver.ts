@@ -6,10 +6,14 @@ import { Channel } from './entities/channel.entity';
 import { ChannelService } from './channel.service';
 import { NewChannelInput } from './dto/new-channel.input';
 import { CurrentUserId } from 'src/auth/decorators/current-userid.decorator';
+import { PublicChannelService } from './services/public-channel.service';
 
 @Resolver()
 export class ChannelResolver {
-  constructor(private readonly channelService: ChannelService) {}
+  constructor(
+    private readonly channelService: ChannelService,
+    private readonly publicChannelService: PublicChannelService,
+  ) {}
 
   @Mutation(() => Channel, {
     name: 'createChannel',
@@ -91,6 +95,20 @@ export class ChannelResolver {
   ) {
     if (userId !== id && !DEBUG)
       throw new ForbiddenException('User not authorized to join channel');
-    return this.channelService.joinPublicChannel(channelId, userId);
+    return this.publicChannelService.joinPublicChannel(channelId, userId);
+  }
+
+  @Mutation(() => Channel, {
+    name: 'leavePublicChannel',
+    description: 'Leave a public channel',
+  })
+  async leavePublicChannel(
+    @CurrentUserId() id: string,
+    @Args('userId') userId: string,
+    @Args('channelId') channelId: string,
+  ) {
+    if (userId !== id && !DEBUG)
+      throw new ForbiddenException('User not authorized to leave channel');
+    return this.publicChannelService.leavePublicChannel(channelId, userId);
   }
 }

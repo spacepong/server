@@ -30,6 +30,10 @@ import { ChannelService } from 'src/channel/channel.service';
 import { MessageService } from 'src/message/message.service';
 import { MuteService } from 'src/mute/mute.service';
 import { KickService } from 'src/kick/kick.service';
+import { PublicChannelService } from 'src/channel/services/public-channel.service';
+import { DirectChannelService } from 'src/channel/services/direct-channel.service';
+import { PrivateChannelService } from 'src/channel/services/private-channel.service';
+import { ProtectedChannelService } from 'src/channel/services/protected-channel.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -94,6 +98,10 @@ import { KickService } from 'src/kick/kick.service';
     AchievementService, // Provide Achievement service throughout the application
     UserAchievementService, // Provide UserAchievement service throughout the application
     ChannelService, // Provide Channel service throughout the application
+    PublicChannelService, // Provide PublicChannel service throughout the application
+    PrivateChannelService, // Provide PrivateChannel service throughout the application
+    ProtectedChannelService, // Provide ProtectedChannel service throughout the application
+    DirectChannelService, // Provide DirectChannel service throughout the application
     MessageService, // Provide Message service throughout the application
     MuteService, // Provide Mute service throughout the application
     KickService, // Provide Kick service throughout the application

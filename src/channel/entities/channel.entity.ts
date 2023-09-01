@@ -162,6 +162,17 @@ export class Channel {
   messages?: Message[];
 
   /**
+   * When the last message was sent in the channel.
+   * @type {Date}
+   */
+  @IsDate({ message: 'Channel last message sent at must be a date' })
+  @Field(() => Date, {
+    description: 'Date the last message was sent in the channel',
+    nullable: true,
+  })
+  lastMessageSentAt?: Date;
+
+  /**
    * The date the channel was created.
    * @type {Date}
    */

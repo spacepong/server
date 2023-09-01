@@ -81,6 +81,9 @@ type Channel {
   """Kicks associated with the channel"""
   kicks: [Kick!]!
 
+  """Date the last message was sent in the channel"""
+  lastMessageSentAt: DateTime
+
   """Messages associated with the channel"""
   messages: [Message!]!
 
@@ -274,6 +277,9 @@ type Mutation {
 
   """Join a public channel"""
   joinPublicChannel(channelId: String!, userId: String!): Channel!
+
+  """Leave a public channel"""
+  leavePublicChannel(channelId: String!, userId: String!): Channel!
 
   """Refreshes all users achievements"""
   refreshUsersAchievements: [Achievement!]!

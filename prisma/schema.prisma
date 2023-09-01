@@ -111,18 +111,19 @@ model UserAchievement {
 }
 
 model Channel {
-    id           String    @id @default(uuid())
-    name         String?
-    description  String?
-    type         String    @default("DIRECT")
-    password     String?
-    firstOwnerId String?
-    ownerId      String?
-    adminIds     String[]  @default([])
-    mutes        Mute[]
-    kicks        Kick[]
-    users        User[]
-    messages     Message[]
+    id                String    @id @default(uuid())
+    name              String?
+    description       String?
+    type              String    @default("DIRECT")
+    password          String?
+    firstOwnerId      String?
+    ownerId           String?
+    adminIds          String[]  @default([])
+    mutes             Mute[]
+    kicks             Kick[]
+    users             User[]
+    messages          Message[]
+    lastMessageSentAt DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
