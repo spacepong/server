@@ -27,6 +27,7 @@ model User {
     messages     Message[]
     kicks        Kick[]
     mutes        Mute[]
+    bans         Ban[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -121,6 +122,7 @@ model Channel {
     adminIds          String[]  @default([])
     mutes             Mute[]
     kicks             Kick[]
+    bans              Ban[]
     users             User[]
     messages          Message[]
     lastMessageSentAt DateTime?
@@ -140,6 +142,7 @@ model Message {
     invite    String?
     unsent    Boolean  @default(false)
     seenBy    String[] @default([])
+    isLog     Boolean  @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -176,4 +179,18 @@ model Kick {
     user    User    @relation(fields: [userId], references: [id])
 
     @@map("kicks")
+}
+
+model Ban {
+    id        String   @id @default(uuid())
+    channelId String
+    userId    String
+    reason    String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    channel Channel @relation(fields: [channelId], references: [id])
+    user    User    @relation(fields: [userId], references: [id])
+
+    @@map("bans")
 }
