@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 
 import { Channel } from '../entities/channel.entity';
-import { ChannelService } from '../channel.service';
+import {
+  ChannelService,
+  ValidateChannelBeforeLeaving,
+} from '../channel.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { channelIncludes } from 'src/includes/channel.includes';
 import { NewChannelInput } from '../dto/new-channel.input';
@@ -93,6 +96,24 @@ export class PublicChannelService {
   }
 
   /**
+   * Retrieves a list of all public channels.
+   * Public channels are channels that anyone can join.
+   *
+   * @returns {Promise<Channel[]>} A promise that resolves to the list of all public channels.
+   */
+  getAllPublicChannels(): Promise<Channel[]> {
+    return this.prismaService.channel.findMany({
+      where: {
+        type: 'PUBLIC',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: channelIncludes,
+    });
+  }
+
+  /**
    * Joins a public channel.
    *
    * @param {string} channelId - The ID of the channel to join.
@@ -162,64 +183,33 @@ export class PublicChannelService {
     channelId: string,
     userId: string,
   ): Promise<Channel> {
-    const channel: Channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: channelId,
-      },
-      include: channelIncludes,
-    });
-
-    if (!channel) throw new NotFoundException('Channel not found');
-
-    if (channel.type !== 'PUBLIC')
-      throw new ForbiddenException('Channel is not public');
-
-    if (!channel.users.some((user) => user.id === userId))
-      throw new ForbiddenException('User not in channel');
-
-    const isOwner: boolean = userId === channel.ownerId;
-    const isAdmin: boolean = channel.adminIds.some(
-      (adminId: string) => adminId === userId,
-    );
-
     /**
      * @description
-     * If the user is the owner and there are other admins, set the first admin as the new owner.
-     * If the user is the owner and there are no other admins, set the first user as the new owner.
-     * If there is no other user, set the owner to null.
+     * Checks if the channel exists and if the user is in the channel or if the channel is not public.
+     * If so, throws an exception.
+     * Also checks if the user is the owner or an admin.
+     * If so, sets the new owner and updates the list of admins.
      */
-    let newOwnerId: string = null;
-    if (isOwner) {
-      for (const adminId of channel.adminIds)
-        if (adminId !== channel.ownerId) {
-          newOwnerId = adminId;
-          break;
-        }
-      if (!newOwnerId)
-        for (const user of channel.users) {
-          if (user.id !== channel.ownerId) {
-            newOwnerId = user.id;
-            break;
-          }
-        }
-    }
-
-    /**
-     * @description
-     * If the user is an admin, remove them from the list of admins.
-     * If there is a new owner, add them to the list of admins.
-     */
-    const adminIdsSet: Set<string> = new Set(channel.adminIds);
-    adminIdsSet.delete(userId);
-    isOwner && newOwnerId && adminIdsSet.add(newOwnerId);
-    const adminIds: string[] = Array.from(adminIdsSet);
+    const {
+      isOwner,
+      isAdmin,
+      newOwnerId,
+      adminIds,
+      channel,
+    }: ValidateChannelBeforeLeaving =
+      await ChannelService.validateChannelBeforeLeaving(
+        channelId,
+        userId,
+        'PUBLIC',
+        this.prismaService,
+      );
 
     try {
       /**
        * @description
-       * Disconnect the user from the channel.
        * If the user is the owner, set the new owner.
        * If the user is an admin, set the new admins from the updated list.
+       * Disconnect the user from the channel.
        */
       const channelLeft: Channel = await this.prismaService.channel.update({
         where: {

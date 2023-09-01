@@ -41,7 +41,7 @@ export class ChannelResolver {
     description: 'Get all public channels',
   })
   getAllPublicChannels() {
-    return this.channelService.getAllPublicChannels();
+    return this.publicChannelService.getAllPublicChannels();
   }
 
   @Query(() => [Channel], {
