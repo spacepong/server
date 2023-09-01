@@ -2,7 +2,6 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 
 import { Channel } from '../entities/channel.entity';
@@ -107,7 +106,7 @@ export class PublicChannelService {
         type: 'PUBLIC',
       },
       orderBy: {
-        createdAt: 'desc',
+        updatedAt: 'desc',
       },
       include: channelIncludes,
     });
@@ -124,20 +123,17 @@ export class PublicChannelService {
    * @throws {InternalServerErrorException} If an error occurs while joining the channel.
    */
   async joinPublicChannel(channelId: string, userId: string): Promise<Channel> {
-    const channel: Channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: channelId,
-      },
-      include: channelIncludes,
-    });
-
-    if (!channel) throw new NotFoundException('Channel not found');
-
-    if (channel.type !== 'PUBLIC')
-      throw new ForbiddenException('Channel is not public');
-
-    if (channel.users.some((user) => user.id === userId))
-      throw new ForbiddenException('User already in channel');
+    /**
+     * @description
+     * Checks if the channel exists and if the user is in the channel or if the channel is not public.
+     * If so, throws an exception.
+     */
+    const channel: Channel = await ChannelService.validateChannelBeforeJoining(
+      channelId,
+      userId,
+      'PUBLIC',
+      this.prismaService,
+    );
 
     try {
       /**

@@ -1,6 +1,5 @@
 import {
   Injectable,
-  NotFoundException,
   ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -96,6 +95,24 @@ export class PrivateChannelService {
   }
 
   /**
+   * Retrieves a list of all private channels.
+   * Private channels are channels that only invited users can join.
+   *
+   * @returns {Promise<Channel[]>} A promise that resolves to the list of all private channels.
+   */
+  getAllPrivateChannels(): Promise<Channel[]> {
+    return this.prismaService.channel.findMany({
+      where: {
+        type: 'PRIVATE',
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      include: channelIncludes,
+    });
+  }
+
+  /**
    * Joins a private channel.
    *
    * @param {string} channelId - The ID of the channel to join.
@@ -109,20 +126,17 @@ export class PrivateChannelService {
     channelId: string,
     userId: string,
   ): Promise<Channel> {
-    const channel: Channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: channelId,
-      },
-      include: channelIncludes,
-    });
-
-    if (!channel) throw new NotFoundException('Channel not found');
-
-    if (channel.type !== 'PRIVATE')
-      throw new ForbiddenException('Channel is not private');
-
-    if (channel.users.some((user) => user.id === userId))
-      throw new ForbiddenException('User already in channel');
+    /**
+     * @description
+     * Checks if the channel exists and if the user is in the channel or if the channel is not private.
+     * If so, throws an exception.
+     */
+    const channel: Channel = await ChannelService.validateChannelBeforeJoining(
+      channelId,
+      userId,
+      'PRIVATE',
+      this.prismaService,
+    );
 
     try {
       /**
@@ -154,13 +168,23 @@ export class PrivateChannelService {
     }
   }
 
+  /**
+   * Leaves a private channel.
+   *
+   * @param {string} channelId - The ID of the channel to leave.
+   * @param {string} userId - The ID of the user leaving the channel.
+   * @returns {Promise<Channel>} A promise that resolves to the left channel.
+   * @throws {NotFoundException} If the channel is not found.
+   * @throws {ForbiddenException} If the channel is not private or the user is not in the channel.
+   * @throws {InternalServerErrorException} If an error occurs while leaving the channel.
+   */
   async leavePrivateChannel(
     channelId: string,
     userId: string,
   ): Promise<Channel> {
     /**
      * @description
-     * Checks if the channel exists and if the user is in the channel or if the channel is not public.
+     * Checks if the channel exists and if the user is in the channel or if the channel is not private.
      * If so, throws an exception.
      * Also checks if the user is the owner or an admin.
      * If so, sets the new owner and updates the list of admins.

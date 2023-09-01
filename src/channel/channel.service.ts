@@ -97,6 +97,42 @@ export class ChannelService {
   }
 
   /**
+   * Validates a channel before joining.
+   *
+   * @static
+   * @param {string} channelId - The ID of the channel to validate.
+   * @param {string} userId - The ID of the user to validate.
+   * @param {string} type - The type of the channel to validate.
+   * @param {PrismaService} prismaService - The Prisma service for database operations.
+   * @returns {Promise<Channel>} A promise that resolves to the validated channel.
+   * @throws {NotFoundException} If the channel is not found.
+   * @throws {ForbiddenException} If the channel is not the correct type or the user is already in the channel.
+   */
+  static async validateChannelBeforeJoining(
+    channelId: string,
+    userId: string,
+    type: string,
+    prismaService: PrismaService,
+  ): Promise<Channel> {
+    const channel: Channel = await prismaService.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: channelIncludes,
+    });
+
+    if (!channel) throw new NotFoundException('Channel not found');
+
+    if (channel.type !== type)
+      throw new ForbiddenException(`Channel is not ${type.toLowerCase()}`);
+
+    if (channel.users.find((user) => user.id === userId))
+      throw new ForbiddenException('User is already in channel');
+
+    return channel;
+  }
+
+  /**
    * Validates a channel before leaving.
    *
    * @static
@@ -230,51 +266,6 @@ export class ChannelService {
    */
   getAllChannels(): Promise<Channel[]> {
     return this.prismaService.channel.findMany({
-      include: channelIncludes,
-    });
-  }
-
-  /**
-   * Retrieves a list of all private channels.
-   * Private channels are channels that only invited users can join.
-   *
-   * @returns {Promise<Channel[]>} A promise that resolves to the list of all private channels.
-   */
-  getAllPrivateChannels(): Promise<Channel[]> {
-    return this.prismaService.channel.findMany({
-      where: {
-        type: 'PRIVATE',
-      },
-      include: channelIncludes,
-    });
-  }
-
-  /**
-   * Retrieves a list of all protected channels.
-   * Protected channels are channels that anyone with the password can join.
-   *
-   * @returns {Promise<Channel[]>} A promise that resolves to the list of all protected channels.
-   */
-  getAllProtectedChannels(): Promise<Channel[]> {
-    return this.prismaService.channel.findMany({
-      where: {
-        type: 'PROTECTED',
-      },
-      include: channelIncludes,
-    });
-  }
-
-  /**
-   * Retrieves a list of all direct channels.
-   * Direct channels are direct messages between two users.
-   *
-   * @returns {Promise<Channel[]>} A promise that resolves to the list of all direct channels.
-   */
-  getAllDirectChannels(): Promise<Channel[]> {
-    return this.prismaService.channel.findMany({
-      where: {
-        type: 'DIRECT',
-      },
       include: channelIncludes,
     });
   }

@@ -7,12 +7,18 @@ import { ChannelService } from './channel.service';
 import { NewChannelInput } from './dto/new-channel.input';
 import { CurrentUserId } from 'src/auth/decorators/current-userid.decorator';
 import { PublicChannelService } from './services/public-channel.service';
+import { PrivateChannelService } from './services/private-channel.service';
+import { ProtectedChannelService } from './services/protected-channel.service';
+import { DirectChannelService } from './services/direct-channel.service';
 
 @Resolver()
 export class ChannelResolver {
   constructor(
     private readonly channelService: ChannelService,
     private readonly publicChannelService: PublicChannelService,
+    private readonly privateChannelService: PrivateChannelService,
+    private readonly protectedChannelService: ProtectedChannelService,
+    private readonly directChannelService: DirectChannelService,
   ) {}
 
   @Mutation(() => Channel, {
@@ -49,7 +55,7 @@ export class ChannelResolver {
     description: 'Get all private channels',
   })
   getAllPrivateChannels() {
-    return this.channelService.getAllPrivateChannels();
+    return this.privateChannelService.getAllPrivateChannels();
   }
 
   @Query(() => [Channel], {
@@ -57,7 +63,7 @@ export class ChannelResolver {
     description: 'Get all protected channels',
   })
   getAllProtectedChannels() {
-    return this.channelService.getAllProtectedChannels();
+    return this.protectedChannelService.getAllProtectedChannels();
   }
 
   @Query(() => [Channel], {
@@ -65,7 +71,7 @@ export class ChannelResolver {
     description: 'Get all direct channels',
   })
   getAllDirectChannels() {
-    return this.channelService.getAllDirectChannels();
+    return this.directChannelService.getAllDirectChannels();
   }
 
   @Query(() => Channel, {
