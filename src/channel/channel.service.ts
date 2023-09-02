@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 
+import { Ban } from 'src/ban/entities/ban.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NewChannelInput } from './dto/new-channel.input';
 import { Channel, ChannelType } from './entities/channel.entity';
@@ -107,6 +108,7 @@ export class ChannelService {
    * @returns {Promise<Channel>} A promise that resolves to the validated channel.
    * @throws {NotFoundException} If the channel is not found.
    * @throws {ForbiddenException} If the channel is not the correct type or the user is already in the channel.
+   * @throws {ForbiddenException} If the user is banned from the channel.
    */
   static async validateChannelBeforeJoining(
     channelId: string,
@@ -128,6 +130,9 @@ export class ChannelService {
 
     if (channel.users.find((user) => user.id === userId))
       throw new ForbiddenException('User is already in channel');
+
+    if (channel.bans.find((ban: Ban) => ban.userId === userId))
+      throw new ForbiddenException('User is banned from channel');
 
     return channel;
   }
@@ -260,12 +265,15 @@ export class ChannelService {
   }
 
   /**
-   * Retrieves a list of all channels.
+   * Retrieves a list of all channels ordered by most recent.
    *
    * @returns {Promise<Channel[]>} A promise that resolves to the list of all channels.
    */
   getAllChannels(): Promise<Channel[]> {
     return this.prismaService.channel.findMany({
+      orderBy: {
+        updatedAt: 'desc',
+      },
       include: channelIncludes,
     });
   }
@@ -310,5 +318,115 @@ export class ChannelService {
       },
       include: channelIncludes,
     });
+  }
+
+  /**
+   * Adds an administator to a channel.
+   *
+   * @param {string} channelId - The ID of the channel to add the administrator to.
+   * @param {string} userId - The ID of the user to add as an administrator.
+   * @returns {Promise<Channel>} A promise that resolves to the updated channel.
+   * @throws {NotFoundException} If the channel is not found.
+   * @throws {ForbiddenException} If the channel is a direct channel.
+   * @throws {ForbiddenException} If the user is already the owner.
+   * @throws {ForbiddenException} If the user is not in the channel.
+   * @throws {ForbiddenException} If the user is already an administrator.
+   * @throws {InternalServerErrorException} If an error occurred while adding the administrator.
+   */
+  async addAdmin(channelId: string, userId: string): Promise<Channel> {
+    const channel: Channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: channelIncludes,
+    });
+
+    if (!channel) throw new NotFoundException('Channel not found');
+
+    if (channel.type === ChannelType.DIRECT)
+      throw new ForbiddenException('Cannot add admin to direct channel');
+
+    if (channel.ownerId === userId)
+      throw new ForbiddenException('User is already owner');
+
+    if (!channel.users.some((user) => user.id === userId))
+      throw new ForbiddenException('User not in channel');
+
+    if (channel.adminIds.some((adminId) => adminId === userId))
+      throw new ForbiddenException('User is already admin');
+
+    try {
+      const channelUpdated: Channel = await this.prismaService.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          adminIds: {
+            push: userId,
+          },
+        },
+        include: channelIncludes,
+      });
+      return channelUpdated;
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'An error occurred while adding the admin',
+      );
+    }
+  }
+
+  /**
+   * Removes an administrator from a channel.
+   *
+   * @param {string} channelId - The ID of the channel to remove the administrator from.
+   * @param {string} userId - The ID of the user to remove as an administrator.
+   * @returns {Promise<Channel>} A promise that resolves to the updated channel.
+   * @throws {NotFoundException} If the channel is not found.
+   * @throws {ForbiddenException} If the channel is a direct channel.
+   * @throws {ForbiddenException} If the user is the owner.
+   * @throws {ForbiddenException} If the user is not in the channel.
+   * @throws {ForbiddenException} If the user is not an administrator.
+   * @throws {InternalServerErrorException} If an error occurred while removing the administrator.
+   */
+  async removeAdmin(channelId: string, userId: string): Promise<Channel> {
+    const channel: Channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: channelIncludes,
+    });
+
+    if (!channel) throw new NotFoundException('Channel not found');
+
+    if (channel.type === ChannelType.DIRECT)
+      throw new ForbiddenException('Cannot remove admin from direct channel');
+
+    if (channel.ownerId === userId)
+      throw new ForbiddenException('User is owner');
+
+    if (!channel.users.some((user) => user.id === userId))
+      throw new ForbiddenException('User not in channel');
+
+    if (!channel.adminIds.some((adminId) => adminId === userId))
+      throw new ForbiddenException('User is not admin');
+
+    try {
+      const channelUpdated: Channel = await this.prismaService.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          adminIds: {
+            set: channel.adminIds.filter((adminId) => adminId !== userId),
+          },
+        },
+        include: channelIncludes,
+      });
+      return channelUpdated;
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'An error occurred while removing the admin',
+      );
+    }
   }
 }

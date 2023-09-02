@@ -4,7 +4,15 @@ import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 import { User } from 'src/user/entities/user.entity';
 import { Mute } from 'src/mute/entities/mute.entity';
 import { Kick } from 'src/kick/entities/kick.entity';
+import { Ban } from 'src/ban/entities/ban.entity';
 import { Message } from 'src/message/entities/message.entity';
+
+interface ChannelType {
+  PUBLIC: string;
+  PRIVATE: string;
+  PROTECTED: string;
+  DIRECT: string;
+}
 
 /**
  * Represents the type of a channel.
@@ -14,7 +22,7 @@ import { Message } from 'src/message/entities/message.entity';
  * @property {string} PROTECTED - A protected channel (requires password).
  * @property {string} DIRECT - A direct channel (between two users).
  */
-export const ChannelType: object = {
+export const ChannelType: ChannelType = {
   PUBLIC: 'PUBLIC',
   PRIVATE: 'PRIVATE',
   PROTECTED: 'PROTECTED',
@@ -134,10 +142,21 @@ export class Channel {
    * @default []
    */
   @Field(() => [Kick], {
-    description: 'Kicks associated with the channel',
+    description: 'IDs of kicked users associated with the channel',
     defaultValue: [],
   })
   kicks?: Kick[];
+
+  /**
+   * The banned users of the channel.
+   * @type {Ban[]}
+   * @default []
+   */
+  @Field(() => [Ban], {
+    description: 'IDs of banned users associated with the channel',
+    defaultValue: [],
+  })
+  bans?: Ban[];
 
   /**
    * The members of the channel.

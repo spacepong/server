@@ -34,6 +34,8 @@ import { PublicChannelService } from 'src/channel/services/public-channel.servic
 import { DirectChannelService } from 'src/channel/services/direct-channel.service';
 import { PrivateChannelService } from 'src/channel/services/private-channel.service';
 import { ProtectedChannelService } from 'src/channel/services/protected-channel.service';
+import { BanModule } from 'src/ban/ban.module';
+import { BanService } from 'src/ban/ban.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -87,6 +89,7 @@ import { ProtectedChannelService } from 'src/channel/services/protected-channel.
     MessageModule,
     MuteModule,
     KickModule,
+    BanModule,
   ],
   providers: [
     PrismaService, // Provide Prisma service throughout the application
@@ -105,6 +108,7 @@ import { ProtectedChannelService } from 'src/channel/services/protected-channel.
     MessageService, // Provide Message service throughout the application
     MuteService, // Provide Mute service throughout the application
     KickService, // Provide Kick service throughout the application
+    BanService, // Provide Ban service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
   controllers: [AppController], // Provide App controller throughout the application
