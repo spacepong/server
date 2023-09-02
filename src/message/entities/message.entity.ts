@@ -117,6 +117,18 @@ export class Message {
   seenBy: string[];
 
   /**
+   * Whether or not the message is a system log.
+   * @type {boolean}
+   * @default false
+   */
+  @IsBoolean({ message: 'Message is system log must be a boolean' })
+  @Field(() => Boolean, {
+    description: 'Whether or not the message is a system log',
+    defaultValue: false,
+  })
+  isLog?: boolean;
+
+  /**
    * The date when the message was created.
    * @type {Date}
    */
