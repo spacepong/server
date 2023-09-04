@@ -77,6 +77,17 @@ export class Mute {
   reason?: string;
 
   /**
+   * The date and time the mute expires.
+   * @type {Date}
+   */
+  @IsNotEmpty({ message: 'Mute expires at must not be empty' })
+  @IsDate({ message: 'Mute expires at must be a date' })
+  @Field(() => Date, {
+    description: 'Date and time the mute expires',
+  })
+  expiresAt: Date;
+
+  /**
    * The date and time the mute was created.
    * @type {Date}
    */

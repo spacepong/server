@@ -350,6 +350,9 @@ type Mutation {
   """Leave a public channel"""
   leavePublicChannel(channelId: String!, userId: String!): Channel!
 
+  """Create a new mute record"""
+  muteUser(newMuteInput: NewMuteInput!): Mute!
+
   """Refreshes all users achievements"""
   refreshUsersAchievements: [Achievement!]!
 
@@ -399,6 +402,9 @@ type Mute {
 
   """Duration of the mute"""
   duration: Int!
+
+  """Date and time the mute expires"""
+  expiresAt: DateTime!
 
   """Unique identifier for the mute"""
   id: String!
@@ -490,6 +496,23 @@ input NewMessageInput {
 
   """ID of the associated user"""
   userId: String!
+}
+
+input NewMuteInput {
+  """ID of the associated channel"""
+  channelId: String!
+
+  """Duration of the mute"""
+  duration: Float!
+
+  """Reason for the mute"""
+  reason: String
+
+  """ID of the associated user sending the request"""
+  userId: String!
+
+  """ID of the associated user to mute"""
+  userIdToMute: String!
 }
 
 type Query {
