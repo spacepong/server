@@ -2,7 +2,7 @@ import { Field, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 @InputType()
-export class NewKickInput {
+export class DeleteKickInput {
   @IsNotEmpty({ message: 'User ID must not be empty' })
   @IsString({ message: 'User ID must be a string' })
   @Field(() => String, {
@@ -15,14 +15,13 @@ export class NewKickInput {
   @Field(() => String, { description: 'ID of the associated channel' })
   channelId: string;
 
-  @IsNotEmpty({ message: 'User ID to kick must not be empty' })
-  @IsString({ message: 'User ID to kick must be a string' })
-  @Field(() => String, { description: 'ID of the associated user to kick' })
-  userIdToKick: string;
+  @IsNotEmpty({ message: 'User ID to unkick must not be empty' })
+  @IsString({ message: 'User ID to unkick must be a string' })
+  @Field(() => String, { description: 'ID of the associated user to unkick' })
+  userIdToUnkick: string;
 
-  @Field(() => String, {
-    description: 'Reason for the kick',
-    nullable: true,
-  })
-  reason?: string;
+  @IsNotEmpty({ message: 'Kick ID must not be empty' })
+  @IsString({ message: 'Kick ID must be a string' })
+  @Field(() => String, { description: 'ID of the associated kick' })
+  kickId: string;
 }

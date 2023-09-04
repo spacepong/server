@@ -62,9 +62,38 @@ type Avatar {
   userId: String!
 }
 
+type Ban {
+  """The associated channel entity"""
+  channel: Channel!
+
+  """ID of the associated channel"""
+  channelId: String!
+
+  """Date and time the ban was created"""
+  createdAt: DateTime!
+
+  """Unique identifier for the ban"""
+  id: String!
+
+  """Ban reason"""
+  reason: String
+
+  """Date and time the ban was last updated"""
+  updatedAt: DateTime!
+
+  """The associated user entity"""
+  user: User!
+
+  """ID of the associated user"""
+  userId: String!
+}
+
 type Channel {
   """Unique identifiers for the channel admins"""
   adminIds: [String!]!
+
+  """IDs of banned users associated with the channel"""
+  bans: [Ban!]!
 
   """Date the channel was created"""
   createdAt: DateTime!
@@ -78,7 +107,7 @@ type Channel {
   """Unique identifier for the channel"""
   id: String!
 
-  """Kicks associated with the channel"""
+  """IDs of kicked users associated with the channel"""
   kicks: [Kick!]!
 
   """Date the last message was sent in the channel"""
@@ -144,6 +173,34 @@ type Connection {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+input DeleteBanInput {
+  """ID of the associated ban"""
+  banId: String!
+
+  """ID of the associated channel"""
+  channelId: String!
+
+  """ID of the associated user sending the request"""
+  userId: String!
+
+  """ID of the associated user to unban"""
+  userIdToUnban: String!
+}
+
+input DeleteKickInput {
+  """ID of the associated channel"""
+  channelId: String!
+
+  """ID of the associated kick"""
+  kickId: String!
+
+  """ID of the associated user sending the request"""
+  userId: String!
+
+  """ID of the associated user to unkick"""
+  userIdToUnkick: String!
+}
 
 type Kick {
   """The associated channel entity"""
@@ -216,6 +273,9 @@ type Message {
   """Invite to a game"""
   invite: String
 
+  """Whether or not the message is a system log"""
+  isLog: Boolean!
+
   """Photo of the message"""
   photo: String
 
@@ -239,6 +299,9 @@ type Message {
 }
 
 type Mutation {
+  """Create a new ban record"""
+  banUser(newBanInput: NewBanInput!): Ban!
+
   """Blocks a user"""
   blockUser(blockId: String!, userId: String!): User!
 
@@ -250,6 +313,9 @@ type Mutation {
 
   """Creates a new match with the given data"""
   createMatch(newMatchInput: NewMatchInput!): Match!
+
+  """Create a new message"""
+  createMessage(newMessageInput: NewMessageInput!): Message!
 
   """Create user achievements for a user."""
   createUserAchievements(userId: String!): User!
@@ -278,6 +344,9 @@ type Mutation {
   """Join a public channel"""
   joinPublicChannel(channelId: String!, userId: String!): Channel!
 
+  """Create a new kick record"""
+  kickUser(newKickInput: NewKickInput!): Kick!
+
   """Leave a public channel"""
   leavePublicChannel(channelId: String!, userId: String!): Channel!
 
@@ -290,11 +359,17 @@ type Mutation {
   """Turns on 2FA for the current user"""
   turnOn2fa(token: String!, userId: String!): Auth!
 
+  """Delete a ban record"""
+  unbanUser(deleteBanInput: DeleteBanInput!): Ban!
+
   """Unblocks a user"""
   unblockUser(unblockId: String!, userId: String!): User!
 
   """Unfollows a user"""
   unfollowUser(unfollowId: String!, userId: String!): User!
+
+  """Delete a kick record"""
+  unkickUser(deleteKickInput: DeleteKickInput!): Kick!
 
   """Updates an achievement"""
   updateAchievement(achievementId: String!, updateAchievementInput: UpdateAchievementInput!): Achievement!
@@ -341,6 +416,20 @@ type Mute {
   userId: String!
 }
 
+input NewBanInput {
+  """ID of the associated channel"""
+  channelId: String!
+
+  """Reason for the ban"""
+  reason: String
+
+  """ID of the associated user sending the request"""
+  userId: String!
+
+  """ID of the associated user to ban"""
+  userIdToBan: String!
+}
+
 input NewChannelInput {
   """Description of the channel"""
   description: String
@@ -361,6 +450,20 @@ input NewChannelInput {
   userIds: [String!]
 }
 
+input NewKickInput {
+  """ID of the associated channel"""
+  channelId: String!
+
+  """Reason for the kick"""
+  reason: String
+
+  """ID of the associated user sending the request"""
+  userId: String!
+
+  """ID of the associated user to kick"""
+  userIdToKick: String!
+}
+
 input NewMatchInput {
   """The ID of the loser"""
   loserId: String!
@@ -370,6 +473,23 @@ input NewMatchInput {
 
   """The ID of the winner"""
   winnerId: String!
+}
+
+input NewMessageInput {
+  """ID of the associated channel"""
+  channelId: String!
+
+  """Invite to a new game"""
+  invite: String
+
+  """Path to the uploaded photo"""
+  photo: String
+
+  """Text of the message"""
+  text: String
+
+  """ID of the associated user"""
+  userId: String!
 }
 
 type Query {
