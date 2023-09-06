@@ -202,6 +202,20 @@ input DeleteKickInput {
   userIdToUnkick: String!
 }
 
+input DeleteMuteInput {
+  """ID of the associated channel"""
+  channelId: String!
+
+  """ID of the associated mute"""
+  muteId: String!
+
+  """ID of the associated user sending the request"""
+  userId: String!
+
+  """ID of the associated user to unmute"""
+  userIdToUnmute: String!
+}
+
 type Kick {
   """The associated channel entity"""
   channel: Channel!
@@ -373,6 +387,9 @@ type Mutation {
 
   """Delete a kick record"""
   unkickUser(deleteKickInput: DeleteKickInput!): Kick!
+
+  """Delete a mute record"""
+  unmuteUser(deleteMuteInput: DeleteMuteInput!): Mute!
 
   """Updates an achievement"""
   updateAchievement(achievementId: String!, updateAchievementInput: UpdateAchievementInput!): Achievement!

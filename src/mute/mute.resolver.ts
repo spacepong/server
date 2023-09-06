@@ -1,11 +1,12 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { ForbiddenException } from '@nestjs/common';
 
+import { DEBUG } from 'src/constants';
 import { Mute } from './entities/mute.entity';
 import { MuteService } from './mute.service';
 import { CurrentUserId } from 'src/auth/decorators/current-userid.decorator';
 import { NewMuteInput } from './dto/new-mute.input';
-import { DEBUG } from 'src/constants';
+import { DeleteMuteInput } from './dto/delete-mute.input';
 
 /**
  * The resolver that deals with mute based GraphQL requests.
@@ -42,5 +43,26 @@ export class MuteResolver {
     if (id !== newMuteInput.userId && !DEBUG)
       throw new ForbiddenException('User not authorized');
     return this.muteService.muteUser(newMuteInput);
+  }
+
+  /**
+   * Deletes a mute record.
+   *
+   * @param {string} id - The ID of the user sending the unmute request.
+   * @param {DeleteMuteInput} deleteMuteInput - The delete mute input data.
+   * @returns {Promise<Mute>} - The deleted mute record.
+   * @throws {ForbiddenException} - When sending an unmute request for another user.
+   */
+  @Mutation(() => Mute, {
+    name: 'unmuteUser',
+    description: 'Delete a mute record',
+  })
+  async unmuteUser(
+    @CurrentUserId() id: string,
+    @Args('deleteMuteInput') deleteMuteInput: DeleteMuteInput,
+  ): Promise<Mute> {
+    if (id !== deleteMuteInput.userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
+    return this.muteService.deleteMute(deleteMuteInput);
   }
 }

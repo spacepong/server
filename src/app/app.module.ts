@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { join } from 'path';
 
@@ -36,6 +37,7 @@ import { PrivateChannelService } from 'src/channel/services/private-channel.serv
 import { ProtectedChannelService } from 'src/channel/services/protected-channel.service';
 import { BanModule } from 'src/ban/ban.module';
 import { BanService } from 'src/ban/ban.service';
+import { TasksService } from 'src/tasks/tasks.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -56,6 +58,9 @@ import { BanService } from 'src/ban/ban.service';
       sortSchema: true, // Sort schema alphabetically
       includeStacktraceInErrorResponses: false, // Disable stacktraces
     }),
+
+    // Configure ScheduleModule for scheduled tasks
+    ScheduleModule.forRoot(),
 
     // Import AuthModule for authentication related features
     AuthModule,
@@ -109,6 +114,7 @@ import { BanService } from 'src/ban/ban.service';
     MuteService, // Provide Mute service throughout the application
     KickService, // Provide Kick service throughout the application
     BanService, // Provide Ban service throughout the application
+    TasksService, // Provide Tasks service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
   ],
   controllers: [AppController], // Provide App controller throughout the application

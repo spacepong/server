@@ -13,6 +13,7 @@ import { NewMuteInput } from './dto/new-mute.input';
 import { channelIncludes } from 'src/includes/channel.includes';
 import { MessageService } from 'src/message/message.service';
 import { muteIncludes } from 'src/includes/mute.includes';
+import { DeleteMuteInput } from './dto/delete-mute.input';
 
 @Injectable()
 export class MuteService {
@@ -73,6 +74,57 @@ export class MuteService {
     } catch (e) {
       throw new InternalServerErrorException(
         'An error occurred while creating the mute',
+      );
+    }
+  }
+
+  async deleteMute(deleteMuteInput: DeleteMuteInput): Promise<Mute> {
+    const channel: Channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: deleteMuteInput.channelId,
+      },
+      include: channelIncludes,
+    });
+
+    if (!channel) throw new NotFoundException('Channel not found');
+
+    if (!channel.mutes.find((mute: Mute) => mute.id === deleteMuteInput.muteId))
+      throw new NotFoundException('Mute not found');
+
+    if (
+      !channel.adminIds.some(
+        (adminId: string) => adminId === deleteMuteInput.userId,
+      )
+    )
+      throw new ForbiddenException('User not authorized');
+
+    try {
+      const mute: Mute = await this.prismaService.mute.delete({
+        where: {
+          id: deleteMuteInput.muteId,
+        },
+        include: muteIncludes,
+      });
+      return mute;
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'An error occurred while deleting the mute',
+      );
+    }
+  }
+
+  async clearExpiredMutes(): Promise<void> {
+    try {
+      await this.prismaService.mute.deleteMany({
+        where: {
+          expiresAt: {
+            lte: new Date(),
+          },
+        },
+      });
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'An error occurred while clearing expired mutes',
       );
     }
   }
