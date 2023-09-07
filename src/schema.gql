@@ -391,6 +391,9 @@ type Mutation {
   """Delete a mute record"""
   unmuteUser(deleteMuteInput: DeleteMuteInput!): Mute!
 
+  """Unsend a message"""
+  unsendMessage(unsendMessageInput: UnsendMessageInput!): Message!
+
   """Updates an achievement"""
   updateAchievement(achievementId: String!, updateAchievementInput: UpdateAchievementInput!): Achievement!
 
@@ -583,6 +586,17 @@ type Query {
 
   """Retrieves a list of users by their IDs"""
   populateUserIds(userIds: [String!]!): [User!]!
+}
+
+input UnsendMessageInput {
+  """ID of the associated channel"""
+  channelId: String!
+
+  """ID of the associated message"""
+  messageId: String!
+
+  """ID of the associated user sending the request"""
+  userId: String!
 }
 
 input UpdateAchievementInput {

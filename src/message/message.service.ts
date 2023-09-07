@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { NewMessageInput } from './dto/new-message.input';
 import { channelIncludes } from 'src/includes/channel.includes';
 import { messageIncludes } from 'src/includes/message.includes';
+import { UnsendMessageInput } from './dto/unsend-message.input';
 
 @Injectable()
 export class MessageService {
@@ -56,6 +57,36 @@ export class MessageService {
     } catch (e) {
       throw new InternalServerErrorException(
         'An error occurred while creating the message',
+      );
+    }
+  }
+
+  async unsendMessage(
+    unsendMessageInput: UnsendMessageInput,
+  ): Promise<Message> {
+    const message: Message = await this.prismaService.message.findUnique({
+      where: {
+        id: unsendMessageInput.messageId,
+      },
+      include: messageIncludes,
+    });
+
+    if (!message) throw new NotFoundException('Message not found');
+
+    try {
+      const messageUnsent: Message = await this.prismaService.message.update({
+        where: {
+          id: unsendMessageInput.messageId,
+        },
+        data: {
+          unsent: true,
+        },
+        include: messageIncludes,
+      });
+      return messageUnsent;
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'An error occurred while unsending the message',
       );
     }
   }
