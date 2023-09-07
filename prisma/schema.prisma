@@ -27,6 +27,7 @@ model User {
     messages     Message[]
     kicks        Kick[]
     mutes        Mute[]
+    bans         Ban[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -111,17 +112,20 @@ model UserAchievement {
 }
 
 model Channel {
-    id          String    @id @default(uuid())
-    name        String    @unique
-    description String?
-    type        String    @default("DIRECT") // PUBLIC, PRIVATE, PROTECTED, DIRECT
-    password    String?
-    ownerId     String
-    adminIds    String[]
-    mutes       Mute[]
-    kicks       Kick[]
-    users       User[]
-    messages    Message[]
+    id                String    @id @default(uuid())
+    name              String?
+    description       String?
+    type              String    @default("DIRECT")
+    password          String?
+    firstOwnerId      String?
+    ownerId           String?
+    adminIds          String[]  @default([])
+    mutes             Mute[]
+    kicks             Kick[]
+    bans              Ban[]
+    users             User[]
+    messages          Message[]
+    lastMessageSentAt DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -133,9 +137,12 @@ model Message {
     id        String   @id @default(uuid())
     channelId String
     userId    String
-    content   String
+    text      String?
+    photo     String?
+    invite    String?
     unsent    Boolean  @default(false)
     seenBy    String[] @default([])
+    isLog     Boolean  @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -153,6 +160,7 @@ model Mute {
     reason    String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    expiresAt DateTime
 
     channel Channel @relation(fields: [channelId], references: [id])
     user    User    @relation(fields: [userId], references: [id])
@@ -164,6 +172,7 @@ model Kick {
     id        String   @id @default(uuid())
     channelId String
     userId    String
+    reason    String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -171,4 +180,18 @@ model Kick {
     user    User    @relation(fields: [userId], references: [id])
 
     @@map("kicks")
+}
+
+model Ban {
+    id        String   @id @default(uuid())
+    channelId String
+    userId    String
+    reason    String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    channel Channel @relation(fields: [channelId], references: [id])
+    user    User    @relation(fields: [userId], references: [id])
+
+    @@map("bans")
 }

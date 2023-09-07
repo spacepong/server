@@ -5,20 +5,20 @@ import { User } from 'src/user/entities/user.entity';
 import { Channel } from 'src/channel/entities/channel.entity';
 
 /**
- * Represents an individual kick within the system.
- * This entity encapsulates fundamental kick-related details.
+ * Represents an individual ban within the system.
+ * This entity encapsulates fundamental ban-related details.
  *
  * @export
- * @class Kick
+ * @class Ban
  */
 @ObjectType()
-export class Kick {
+export class Ban {
   /**
-   * The unique identifier for the kick.
+   * The unique identifier for the ban.
    * @type {string}
    */
-  @IsNotEmpty({ message: 'Kick ID must not be empty' })
-  @Field(() => String, { description: 'Unique identifier for the kick' })
+  @IsNotEmpty({ message: 'Ban ID must not be empty' })
+  @Field(() => String, { description: 'Unique identifier for the ban' })
   id: string;
 
   /**
@@ -58,31 +58,31 @@ export class Kick {
   user?: User;
 
   /**
-   * The reason for the kick.
+   * The reason for the ban.
    * @type {string}
    */
-  @IsString({ message: 'Kick reason must be a string' })
+  @IsString({ message: 'Ban reason must be a string' })
   @Field(() => String, {
-    description: 'Reason for the kick',
+    description: 'Ban reason',
     nullable: true,
   })
   reason?: string;
 
   /**
-   * The date and time the kick was created.
+   * The date and time the ban was created.
    * @type {Date}
    */
-  @IsNotEmpty({ message: 'Kick creation date must not be empty' })
-  @IsDate({ message: 'Kick creation date must be a valid date' })
-  @Field(() => Date, { description: 'Date and time the kick was created' })
+  @IsNotEmpty({ message: 'Ban creation date must not be empty' })
+  @IsDate({ message: 'Ban creation date must be a valid date' })
+  @Field(() => Date, { description: 'Date and time the ban was created' })
   createdAt: Date;
 
   /**
-   * The date and time the kick was last updated.
+   * The date and time the ban was last updated.
    * @type {Date}
    */
-  @IsNotEmpty({ message: 'Kick updated at must not be empty' })
-  @IsDate({ message: 'Kick updated at must be a valid date' })
-  @Field(() => Date, { description: 'Date and time the kick was last updated' })
+  @IsNotEmpty({ message: 'Ban update date must not be empty' })
+  @IsDate({ message: 'Ban update date must be a valid date' })
+  @Field(() => Date, { description: 'Date and time the ban was last updated' })
   updatedAt: Date;
 }

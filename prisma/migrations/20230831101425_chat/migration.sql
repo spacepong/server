@@ -1,12 +1,13 @@
 -- CreateTable
 CREATE TABLE "channels" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" TEXT,
     "description" TEXT,
     "type" TEXT NOT NULL DEFAULT 'DIRECT',
     "password" TEXT,
-    "ownerId" TEXT NOT NULL,
-    "adminIds" TEXT[],
+    "firstOwnerId" TEXT,
+    "ownerId" TEXT,
+    "adminIds" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -18,7 +19,9 @@ CREATE TABLE "messages" (
     "id" TEXT NOT NULL,
     "channelId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
+    "text" TEXT,
+    "photo" TEXT,
+    "invite" TEXT,
     "unsent" BOOLEAN NOT NULL DEFAULT false,
     "seenBy" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,6 +48,7 @@ CREATE TABLE "kicks" (
     "id" TEXT NOT NULL,
     "channelId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "reason" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -56,9 +60,6 @@ CREATE TABLE "_ChannelToUser" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "channels_name_key" ON "channels"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ChannelToUser_AB_unique" ON "_ChannelToUser"("A", "B");
