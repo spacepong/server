@@ -117,4 +117,70 @@ export class ChannelResolver {
       throw new ForbiddenException('User not authorized to leave channel');
     return this.publicChannelService.leavePublicChannel(channelId, userId);
   }
+
+  @Mutation(() => Channel, {
+    name: 'joinPrivateChannel',
+    description: 'Join a private channel',
+  })
+  async joinPrivateChannel(
+    @CurrentUserId() id: string,
+    @Args('userId') userId: string,
+    @Args('channelId') channelId: string,
+  ) {
+    if (userId !== id && !DEBUG)
+      throw new ForbiddenException('User not authorized to join channel');
+    return this.privateChannelService.joinPrivateChannel(channelId, userId);
+  }
+
+  @Mutation(() => Channel, {
+    name: 'leavePrivateChannel',
+    description: 'Leave a private channel',
+  })
+  async leavePrivateChannel(
+    @CurrentUserId() id: string,
+    @Args('userId') userId: string,
+    @Args('channelId') channelId: string,
+  ) {
+    if (userId !== id && !DEBUG)
+      throw new ForbiddenException('User not authorized to leave channel');
+    return this.privateChannelService.leavePrivateChannel(channelId, userId);
+  }
+
+  @Mutation(() => Channel, {
+    name: 'joinProtectedChannel',
+    description: 'Join a protected channel',
+  })
+  async joinProtectedChannel(
+    @CurrentUserId() id: string,
+    @Args('userId') userId: string,
+    @Args('channelId') channelId: string,
+    @Args('password') password: string,
+  ) {
+    if (userId !== id && !DEBUG)
+      throw new ForbiddenException('User not authorized to join channel');
+    return this.protectedChannelService.joinProtectedChannel(
+      channelId,
+      userId,
+      password,
+    );
+  }
+
+  @Mutation(() => Channel, {
+    name: 'leaveProtectedChannel',
+    description: 'Leave a protected channel',
+  })
+  async leaveProtectedChannel(
+    @CurrentUserId() id: string,
+    @Args('userId') userId: string,
+    @Args('channelId') channelId: string,
+    @Args('password') password: string,
+  ) {
+    if (userId !== id && !DEBUG)
+      throw new ForbiddenException('User not authorized to leave channel');
+    return this.protectedChannelService.leaveProtectedChannel(
+      channelId,
+      userId,
+      password,
+    );
+  }
 }

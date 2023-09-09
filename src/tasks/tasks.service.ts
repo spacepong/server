@@ -40,7 +40,6 @@ export class TasksService {
    */
   @Cron('0 0 * * * *')
   async refreshAchievements() {
-    console.log('Refreshing achievements...');
     await this.achievementService.refreshUsersAchievements();
   }
 }

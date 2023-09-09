@@ -355,11 +355,23 @@ type Mutation {
   """Generates a 2FA token for the current user"""
   generate2faToken(userId: String!, username: String!): Auth!
 
+  """Join a private channel"""
+  joinPrivateChannel(channelId: String!, userId: String!): Channel!
+
+  """Join a protected channel"""
+  joinProtectedChannel(channelId: String!, password: String!, userId: String!): Channel!
+
   """Join a public channel"""
   joinPublicChannel(channelId: String!, userId: String!): Channel!
 
   """Create a new kick record"""
   kickUser(newKickInput: NewKickInput!): Kick!
+
+  """Leave a private channel"""
+  leavePrivateChannel(channelId: String!, userId: String!): Channel!
+
+  """Leave a protected channel"""
+  leaveProtectedChannel(channelId: String!, password: String!, userId: String!): Channel!
 
   """Leave a public channel"""
   leavePublicChannel(channelId: String!, userId: String!): Channel!
