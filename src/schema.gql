@@ -313,6 +313,9 @@ type Message {
 }
 
 type Mutation {
+  """Add a user to the admins of an already joined channel"""
+  addAdmin(channelId: String!, userId: String!): Channel!
+
   """Create a new ban record"""
   banUser(newBanInput: NewBanInput!): Ban!
 
@@ -381,6 +384,9 @@ type Mutation {
 
   """Refreshes all users achievements"""
   refreshUsersAchievements: [Achievement!]!
+
+  """Remove a user from the admins of an already joined channel"""
+  removeAdmin(channelId: String!, userId: String!): Channel!
 
   """Turns off 2FA for the current user"""
   turnOff2fa(token: String!, userId: String!): Auth!

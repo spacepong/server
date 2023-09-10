@@ -100,7 +100,7 @@ export class ChannelResolver {
     @Args('channelId') channelId: string,
   ) {
     if (userId !== id && !DEBUG)
-      throw new ForbiddenException('User not authorized to join channel');
+      throw new ForbiddenException('User not authorized');
     return this.publicChannelService.joinPublicChannel(channelId, userId);
   }
 
@@ -114,7 +114,7 @@ export class ChannelResolver {
     @Args('channelId') channelId: string,
   ) {
     if (userId !== id && !DEBUG)
-      throw new ForbiddenException('User not authorized to leave channel');
+      throw new ForbiddenException('User not authorized');
     return this.publicChannelService.leavePublicChannel(channelId, userId);
   }
 
@@ -128,7 +128,7 @@ export class ChannelResolver {
     @Args('channelId') channelId: string,
   ) {
     if (userId !== id && !DEBUG)
-      throw new ForbiddenException('User not authorized to join channel');
+      throw new ForbiddenException('User not authorized');
     return this.privateChannelService.joinPrivateChannel(channelId, userId);
   }
 
@@ -142,7 +142,7 @@ export class ChannelResolver {
     @Args('channelId') channelId: string,
   ) {
     if (userId !== id && !DEBUG)
-      throw new ForbiddenException('User not authorized to leave channel');
+      throw new ForbiddenException('User not authorized');
     return this.privateChannelService.leavePrivateChannel(channelId, userId);
   }
 
@@ -157,7 +157,7 @@ export class ChannelResolver {
     @Args('password') password: string,
   ) {
     if (userId !== id && !DEBUG)
-      throw new ForbiddenException('User not authorized to join channel');
+      throw new ForbiddenException('User not authorized');
     return this.protectedChannelService.joinProtectedChannel(
       channelId,
       userId,
@@ -176,11 +176,39 @@ export class ChannelResolver {
     @Args('password') password: string,
   ) {
     if (userId !== id && !DEBUG)
-      throw new ForbiddenException('User not authorized to leave channel');
+      throw new ForbiddenException('User not authorized');
     return this.protectedChannelService.leaveProtectedChannel(
       channelId,
       userId,
       password,
     );
+  }
+
+  @Mutation(() => Channel, {
+    name: 'addAdmin',
+    description: 'Add a user to the admins of an already joined channel',
+  })
+  async addAdmin(
+    @CurrentUserId() id: string,
+    @Args('userId') userId: string,
+    @Args('channelId') channelId: string,
+  ) {
+    if (userId !== id && !DEBUG)
+      throw new ForbiddenException('User not authorized');
+    return this.channelService.addAdmin(channelId, userId);
+  }
+
+  @Mutation(() => Channel, {
+    name: 'removeAdmin',
+    description: 'Remove a user from the admins of an already joined channel',
+  })
+  async removeAdmin(
+    @CurrentUserId() id: string,
+    @Args('userId') userId: string,
+    @Args('channelId') channelId: string,
+  ) {
+    if (userId !== id && !DEBUG)
+      throw new ForbiddenException('User not authorized');
+    return this.channelService.removeAdmin(channelId, userId);
   }
 }
