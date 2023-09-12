@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { AchievementService } from 'src/achievement/achievement.service';
 
 import { MuteService } from 'src/mute/mute.service';
 
@@ -16,7 +17,10 @@ export class TasksService {
    *
    * @param {MuteService} muteService - The mute service.
    */
-  constructor(private readonly muteService: MuteService) {}
+  constructor(
+    private readonly muteService: MuteService,
+    private readonly achievementService: AchievementService,
+  ) {}
 
   /**
    * @description
@@ -26,5 +30,17 @@ export class TasksService {
   @Cron('0,30 * * * * *')
   async clearExpiredMutes() {
     await this.muteService.clearExpiredMutes();
+  }
+
+  /**
+   * @description
+   * This method is scheduled to run every hour.
+   * It refreshes the achievements of all users.
+   * This is done to ensure that the achievements are up-to-date.
+   */
+  @Cron('0 0 * * * *')
+  async refreshAchievements() {
+    console.log('Refreshing achievements...');
+    await this.achievementService.refreshUsersAchievements();
   }
 }
