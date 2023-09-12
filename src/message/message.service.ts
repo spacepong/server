@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { Message } from './entities/message.entity';
+import { Mute } from 'src/mute/entities/mute.entity';
 import { Channel } from 'src/channel/entities/channel.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NewMessageInput } from './dto/new-message.input';
@@ -28,6 +29,21 @@ export class MessageService {
     });
 
     if (!channel) throw new NotFoundException('Channel not found');
+
+    if (
+      channel.mutes.some((mute: Mute) => mute.userId === newMessageInput.userId)
+    ) {
+      const mute: Mute = channel.mutes.find(
+        (mute: Mute) => mute.userId === newMessageInput.userId,
+      );
+      if (mute.expiresAt > new Date())
+        throw new NotFoundException('User is muted');
+      await this.prismaService.mute.delete({
+        where: {
+          id: mute.id,
+        },
+      });
+    }
 
     if (
       isLog &&

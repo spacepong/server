@@ -25,6 +25,18 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
+   * Checks if the provided username is an admin.
+   *
+   * @param {string} username - The username to check.
+   * @returns {boolean} - Whether or not the user is an admin.
+   */
+  static checkIfUserIsAdmin(username: string): boolean {
+    return process.env.ADMIN.split(',')
+      .map((admin: string) => admin.trim())
+      .includes(username);
+  }
+
+  /**
    * Retrieves all users with their associated data.
    *
    * @returns {Promise<User[]>} A promise that resolves to an array of users.
@@ -75,6 +87,7 @@ export class UserService {
           },
         },
         username,
+        isAdmin: UserService.checkIfUserIsAdmin(username),
       },
       include: userIncludes,
     });
