@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -8,7 +9,14 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+import { WebsocketGuard } from 'src/auth/guards/websocket.guard';
+import {
+  SocketIOMiddleware,
+  WebsocketMiddleware,
+} from 'src/auth/middlewares/websocket.middleware';
+
 @WebSocketGateway({ cors: true })
+@UseGuards(WebsocketGuard)
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -16,8 +24,8 @@ export class ChatGateway
 
   private users: Map<string, string> = new Map();
 
-  afterInit(server: Server) {
-    server;
+  afterInit(client: Socket) {
+    client.use(WebsocketMiddleware() as SocketIOMiddleware as any);
   }
 
   handleConnection(client: Socket) {
