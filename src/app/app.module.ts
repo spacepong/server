@@ -39,6 +39,7 @@ import { BanModule } from 'src/ban/ban.module';
 import { BanService } from 'src/ban/ban.service';
 import { TasksService } from 'src/tasks/tasks.service';
 import { ChatGateway } from 'src/chat/chat.gateway';
+import { ChatService } from 'src/chat/chat.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -118,6 +119,7 @@ import { ChatGateway } from 'src/chat/chat.gateway';
     TasksService, // Provide Tasks service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
     ChatGateway, // Provide ChatGateway throughout the application
+    ChatService, // Provide ChatService throughout the application
   ],
   controllers: [AppController], // Provide App controller throughout the application
 })
