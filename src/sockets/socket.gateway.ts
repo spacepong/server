@@ -14,7 +14,7 @@ import {
   SocketIOMiddleware,
   WebsocketMiddleware,
 } from 'src/auth/middlewares/websocket.middleware';
-import { ChatService } from './chat.service';
+import { SocketService } from './socket.service';
 import { ChannelService } from 'src/channel/channel.service';
 import {
   WebsocketGuard,
@@ -25,11 +25,11 @@ import { isEmpty } from 'src/utils/is-empty';
 
 @WebSocketGateway({ cors: true })
 @UseGuards(WebsocketGuard)
-export class ChatGateway
+export class SocketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
-    private readonly chatService: ChatService,
+    private readonly socketService: SocketService,
     private readonly channelService: ChannelService,
   ) {}
 
@@ -41,13 +41,13 @@ export class ChatGateway
   }
 
   public handleConnection(client: Socket) {
-    const userId: string = this.chatService.addUser(
+    const userId: string = this.socketService.addUser(
       client,
       getClientHandshake(client, 'userId'),
     );
     if (!userId) return;
 
-    this.server.emit('users', this.chatService.getUserIds());
+    this.server.emit('users', this.socketService.getUserIds());
 
     this.channelService
       .getChannelsByUserId(userId)
@@ -59,10 +59,10 @@ export class ChatGateway
   }
 
   public handleDisconnect(client: Socket): WsResponse<void> {
-    const userId: string = this.chatService.removeUser(client.id);
+    const userId: string = this.socketService.removeUser(client.id);
     if (!userId) return;
 
-    this.server.emit('users', this.chatService.getUserIds());
+    this.server.emit('users', this.socketService.getUserIds());
 
     this.channelService
       .getChannelsByUserId(userId)
@@ -78,7 +78,7 @@ export class ChatGateway
     client: Socket,
     payload: { roomId: string; message: string },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -105,7 +105,7 @@ export class ChatGateway
     client: Socket,
     payload: { roomId: string; typing: boolean },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -133,7 +133,7 @@ export class ChatGateway
       reason?: string;
     },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -165,7 +165,7 @@ export class ChatGateway
       userId: string;
     },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -195,7 +195,7 @@ export class ChatGateway
       userId: string;
     },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -226,7 +226,7 @@ export class ChatGateway
       reason?: string;
     },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -257,7 +257,7 @@ export class ChatGateway
       userId: string;
     },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -286,7 +286,7 @@ export class ChatGateway
       roomId: string;
     },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))
@@ -312,7 +312,7 @@ export class ChatGateway
       roomId: string;
     },
   ): WsResponse<void> {
-    const userId: string = this.chatService.getUserId(client.id);
+    const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
 
     if (isEmpty(payload.roomId))

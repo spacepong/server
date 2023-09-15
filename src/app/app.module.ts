@@ -38,8 +38,8 @@ import { ProtectedChannelService } from 'src/channel/services/protected-channel.
 import { BanModule } from 'src/ban/ban.module';
 import { BanService } from 'src/ban/ban.service';
 import { TasksService } from 'src/tasks/tasks.service';
-import { ChatGateway } from 'src/chat/chat.gateway';
-import { ChatService } from 'src/chat/chat.service';
+import { SocketGateway } from 'src/sockets/socket.gateway';
+import { SocketService } from 'src/sockets/socket.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -118,8 +118,8 @@ import { ChatService } from 'src/chat/chat.service';
     BanService, // Provide Ban service throughout the application
     TasksService, // Provide Tasks service throughout the application
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
-    ChatGateway, // Provide ChatGateway throughout the application
-    ChatService, // Provide ChatService throughout the application
+    SocketGateway, // Provide SocketGateway throughout the application
+    SocketService, // Provide SocketService throughout the application
   ],
   controllers: [AppController], // Provide App controller throughout the application
 })

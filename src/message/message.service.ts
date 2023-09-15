@@ -21,6 +21,20 @@ export class MessageService {
     newMessageInput: NewMessageInput,
     isLog: boolean = false,
   ): Promise<Message> {
+    try {
+      await this.prismaService.mute.deleteMany({
+        where: {
+          expiresAt: {
+            lte: new Date(),
+          },
+        },
+      });
+    } catch (e) {
+      throw new InternalServerErrorException(
+        'An error occurred while clearing expired mutes',
+      );
+    }
+
     const channel: Channel = await this.prismaService.channel.findUnique({
       where: {
         id: newMessageInput.channelId,

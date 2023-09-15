@@ -4,7 +4,7 @@ import { Socket } from 'socket.io';
 import { SocketUser } from './types/socket-user';
 
 @Injectable()
-export class ChatService {
+export class SocketService {
   constructor() {}
 
   private users: SocketUser[] = [];
