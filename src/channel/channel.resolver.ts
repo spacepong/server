@@ -195,7 +195,7 @@ export class ChannelResolver {
   ) {
     if (userId !== id && !DEBUG)
       throw new ForbiddenException('User not authorized');
-    return this.channelService.addAdmin(channelId, userId);
+    return this.channelService.addAdmin(channelId, userId, id);
   }
 
   @Mutation(() => Channel, {
@@ -209,6 +209,6 @@ export class ChannelResolver {
   ) {
     if (userId !== id && !DEBUG)
       throw new ForbiddenException('User not authorized');
-    return this.channelService.removeAdmin(channelId, userId);
+    return this.channelService.removeAdmin(channelId, userId, id);
   }
 }
