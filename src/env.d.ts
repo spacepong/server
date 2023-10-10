@@ -3,6 +3,7 @@ declare global {
     interface ProcessEnv {
       PORT: string;
       DEBUG: string;
+      WS_DEBUG: string;
       ADMIN: string;
       DATABASE_URL: string;
       FRONTEND_URL: string;

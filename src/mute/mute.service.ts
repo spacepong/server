@@ -38,6 +38,9 @@ export class MuteService {
 
     if (!userToMute) throw new NotFoundException('User to kick not found');
 
+    if (newMuteInput.userId === channel.ownerId)
+      throw new ForbiddenException('Cannot mute the channel owner');
+
     if (channel.mutes.some((mute: Mute) => mute.userId === userToMute.id))
       throw new ForbiddenException('User already muted');
 
@@ -45,9 +48,10 @@ export class MuteService {
       !channel.adminIds.some(
         (adminId: string) => adminId === newMuteInput.userId,
       ) ||
-      channel.adminIds.some(
-        (adminId: string) => adminId === newMuteInput.userIdToMute,
-      )
+      (channel.ownerId !== newMuteInput.userId &&
+        channel.adminIds.some(
+          (adminId: string) => adminId === newMuteInput.userIdToMute,
+        ))
     )
       throw new ForbiddenException('User not authorized');
 

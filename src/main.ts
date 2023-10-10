@@ -16,6 +16,9 @@ async function bootstrap(): Promise<void> {
   // Apply a global validation pipe to handle input validation
   app.useGlobalPipes(new ValidationPipe());
 
+  // Enable CORS
+  app.enableCors();
+
   // Start listening on the specified port
   await app.listen(process.env.PORT || 3000);
 }

@@ -62,13 +62,17 @@ export class KickService {
 
     if (!userToKick) throw new NotFoundException('User to kick not found');
 
+    if (newKickInput.userIdToKick === channel.ownerId)
+      throw new ForbiddenException('Cannot kick the channel owner');
+
     if (
       !channel.adminIds.some(
         (adminId: string) => adminId === newKickInput.userId,
       ) ||
-      channel.adminIds.some(
-        (adminId: string) => adminId === newKickInput.userIdToKick,
-      )
+      (channel.ownerId !== newKickInput.userId &&
+        channel.adminIds.some(
+          (adminId: string) => adminId === newKickInput.userIdToKick,
+        ))
     )
       throw new ForbiddenException('User not authorized');
 
@@ -91,6 +95,9 @@ export class KickService {
               id: newKickInput.userIdToKick,
             },
           },
+          adminIds: channel.adminIds.filter(
+            (adminId: string) => adminId !== newKickInput.userIdToKick,
+          ),
         },
       });
       await this.messageService.createMessage(

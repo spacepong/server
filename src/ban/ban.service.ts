@@ -61,13 +61,17 @@ export class BanService {
 
     if (!userToBan) throw new NotFoundException('User to ban not found');
 
+    if (newBanInput.userIdToBan === channel.ownerId)
+      throw new ForbiddenException('Cannot ban the channel owner');
+
     if (
       !channel.adminIds.some(
         (adminId: string) => adminId === newBanInput.userId,
       ) ||
-      channel.adminIds.some(
-        (adminId: string) => adminId === newBanInput.userIdToBan,
-      )
+      (channel.ownerId !== newBanInput.userId &&
+        channel.adminIds.some(
+          (adminId: string) => adminId === newBanInput.userIdToBan,
+        ))
     )
       throw new ForbiddenException('User not authorized');
 
@@ -96,6 +100,9 @@ export class BanService {
               id: newBanInput.userIdToBan,
             },
           },
+          adminIds: channel.adminIds.filter(
+            (adminId: string) => adminId !== newBanInput.userIdToBan,
+          ),
         },
       });
       await this.messageService.createMessage(
