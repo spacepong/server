@@ -79,6 +79,7 @@ export class UserService {
           create: {
             defaultFilename: signInInput.profile._json.image.link,
             filename: signInInput.profile._json.image.link,
+            ingameFilename: `https://robohash.org/set_set1/bgset_bg1/${username}`,
           },
         },
         connection: {
