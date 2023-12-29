@@ -2,197 +2,197 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-    id           String            @id @default(uuid())
-    connection   Connection?
-    avatar       Avatar?
-    username     String?           @unique
-    isAdmin      Boolean           @default(false)
-    rank         Int               @default(100)
-    following    String[]          @default([])
-    blocked      String[]          @default([])
-    lastOnline   DateTime          @default(now())
-    won          Match[]           @relation("WonMatch")
-    lost         Match[]           @relation("LostMatch")
-    achievements UserAchievement[]
-    channels     Channel[]
-    messages     Message[]
-    kicks        Kick[]
-    mutes        Mute[]
-    bans         Ban[]
+  id           String            @id @default(uuid())
+  connection   Connection?
+  avatar       Avatar?
+  username     String?           @unique
+  isAdmin      Boolean           @default(false)
+  rank         Int               @default(100)
+  following    String[]          @default([])
+  blocked      String[]          @default([])
+  lastOnline   DateTime          @default(now())
+  won          Match[]           @relation("WonMatch")
+  lost         Match[]           @relation("LostMatch")
+  achievements UserAchievement[]
+  channels     Channel[]
+  messages     Message[]
+  kicks        Kick[]
+  mutes        Mute[]
+  bans         Ban[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@map("users")
+  @@map("users")
 }
 
 model Match {
-    id       String   @id @default(uuid())
-    score    Int[]    @default([0, 0])
-    winnerId String
-    loserId  String
-    date     DateTime
+  id       String   @id @default(uuid())
+  score    Int[]    @default([0, 0])
+  winnerId String
+  loserId  String
+  date     DateTime
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    winner User @relation("WonMatch", fields: [winnerId], references: [id])
-    loser  User @relation("LostMatch", fields: [loserId], references: [id])
+  winner User @relation("WonMatch", fields: [winnerId], references: [id])
+  loser  User @relation("LostMatch", fields: [loserId], references: [id])
 
-    @@map("matches")
+  @@map("matches")
 }
 
 model Connection {
-    id           String    @id @default(uuid())
-    userId       String    @unique
-    otp          String?
-    otpCreatedAt DateTime?
-    is2faEnabled Boolean   @default(false)
-    intra_42     Int?      @unique
+  id           String    @id @default(uuid())
+  userId       String    @unique
+  otp          String?
+  otpCreatedAt DateTime?
+  is2faEnabled Boolean   @default(false)
+  intra_42     Int?      @unique
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
-    @@map("connections")
+  @@map("connections")
 }
 
 model Avatar {
-    id              String @id @default(uuid())
-    userId          String @unique
-    defaultFilename String
-    filename        String
-    ingameFilename  String
+  id              String @id @default(uuid())
+  userId          String @unique
+  defaultFilename String
+  filename        String
+  ingameFilename  String
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
-    @@map("avatars")
+  @@map("avatars")
 }
 
 model Achievement {
-    id          String            @id @default(uuid())
-    name        String            @unique
-    description String
-    icon        String            @unique
-    users       UserAchievement[]
+  id          String            @id @default(uuid())
+  name        String            @unique
+  description String
+  icon        String            @unique
+  users       UserAchievement[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@map("achievements")
+  @@map("achievements")
 }
 
 model UserAchievement {
-    id            String    @id @default(uuid())
-    userId        String
-    achievementId String
-    isAchieved    Boolean   @default(false)
-    achievedAt    DateTime?
+  id            String    @id @default(uuid())
+  userId        String
+  achievementId String
+  isAchieved    Boolean   @default(false)
+  achievedAt    DateTime?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    achievement Achievement @relation(fields: [achievementId], references: [id])
-    user        User        @relation(fields: [userId], references: [id])
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
 
-    @@unique([userId, achievementId])
-    @@map("user_achievements")
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
 }
 
 model Channel {
-    id                String    @id @default(uuid())
-    name              String?
-    description       String?
-    type              String    @default("DIRECT")
-    password          String?
-    firstOwnerId      String?
-    ownerId           String?
-    adminIds          String[]  @default([])
-    mutes             Mute[]
-    kicks             Kick[]
-    bans              Ban[]
-    users             User[]
-    messages          Message[]
-    lastMessageSentAt DateTime?
+  id                String    @id @default(uuid())
+  name              String?
+  description       String?
+  type              String    @default("DIRECT")
+  password          String?
+  firstOwnerId      String?
+  ownerId           String?
+  adminIds          String[]  @default([])
+  mutes             Mute[]
+  kicks             Kick[]
+  bans              Ban[]
+  users             User[]
+  messages          Message[]
+  lastMessageSentAt DateTime?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@map("channels")
+  @@map("channels")
 }
 
 model Message {
-    id        String   @id @default(uuid())
-    channelId String
-    userId    String
-    text      String?
-    photo     String?
-    invite    String?
-    unsent    Boolean  @default(false)
-    seenBy    String[] @default([])
-    isLog     Boolean  @default(false)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        String   @id @default(uuid())
+  channelId String
+  userId    String
+  text      String?
+  photo     String?
+  invite    String?
+  unsent    Boolean  @default(false)
+  seenBy    String[] @default([])
+  isLog     Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    channel Channel @relation(fields: [channelId], references: [id])
-    user    User    @relation(fields: [userId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
-    @@map("messages")
+  @@map("messages")
 }
 
 model Mute {
-    id        String   @id @default(uuid())
-    channelId String
-    userId    String
-    duration  Int
-    reason    String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    expiresAt DateTime
+  id        String   @id @default(uuid())
+  channelId String
+  userId    String
+  duration  Int
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
 
-    channel Channel @relation(fields: [channelId], references: [id])
-    user    User    @relation(fields: [userId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
-    @@map("mutes")
+  @@map("mutes")
 }
 
 model Kick {
-    id        String   @id @default(uuid())
-    channelId String
-    userId    String
-    reason    String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        String   @id @default(uuid())
+  channelId String
+  userId    String
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    channel Channel @relation(fields: [channelId], references: [id])
-    user    User    @relation(fields: [userId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
-    @@map("kicks")
+  @@map("kicks")
 }
 
 model Ban {
-    id        String   @id @default(uuid())
-    channelId String
-    userId    String
-    reason    String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        String   @id @default(uuid())
+  channelId String
+  userId    String
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    channel Channel @relation(fields: [channelId], references: [id])
-    user    User    @relation(fields: [userId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
-    @@map("bans")
+  @@map("bans")
 }

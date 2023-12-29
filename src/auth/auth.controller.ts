@@ -57,9 +57,9 @@ export class AuthController {
     // Set the access token as a cookie
     res.cookie('accessToken', response.accessToken, {
       // Cookie is not accessible via client-side JavaScript for better security
-      httpOnly: true,
+      httpOnly: false,
       // Cookie is only sent to the server via HTTPS
-      secure: true,
+      secure: false,
     });
 
     // Redirect the user to the frontend
@@ -97,9 +97,9 @@ export class AuthController {
     // Set the access token as a cookie
     res.cookie('accessToken', response.accessToken, {
       // Cookie is not accessible via client-side JavaScript for better security
-      httpOnly: true,
+      httpOnly: false,
       // Cookie is only sent to the server via HTTPS
-      secure: true,
+      secure: false,
     });
 
     // Redirect the user to the frontend
