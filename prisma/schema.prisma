@@ -72,6 +72,7 @@ model Avatar {
     userId          String @unique
     defaultFilename String
     filename        String
+    ingameFilename  String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
