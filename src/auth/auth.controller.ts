@@ -103,8 +103,6 @@ export class AuthController {
     });
 
     // Redirect the user to the frontend
-    res.json({
-      accessToken: response.accessToken,
-    });
+    res.json({ accessToken: response.accessToken });
   }
 }

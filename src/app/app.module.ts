@@ -40,6 +40,7 @@ import { BanService } from 'src/ban/ban.service';
 import { TasksService } from 'src/tasks/tasks.service';
 import { SocketGateway } from 'src/sockets/socket.gateway';
 import { SocketService } from 'src/sockets/socket.service';
+import { InvitationService } from 'src/sockets/Invitation.service';
 
 /**
  * Main application module that configures and initializes various modules.
@@ -120,6 +121,7 @@ import { SocketService } from 'src/sockets/socket.service';
     { provide: APP_GUARD, useClass: AccessTokenGuard }, // Use access token guard for all routes
     SocketGateway, // Provide SocketGateway throughout the application
     SocketService, // Provide SocketService throughout the application
+    InvitationService, // Provide InvitationService throughout the application
   ],
   controllers: [AppController], // Provide App controller throughout the application
 })
