@@ -418,6 +418,9 @@ type Mutation {
   """Updates the avatar of a user"""
   updateAvatar(avatar: String!, userId: String!): User!
 
+  """Updates the rank of a user"""
+  updateRank(rank: Float!, userId: String!): User!
+
   """Update an achievement of a user."""
   updateUserAchievement(achievementId: String!, isAchieved: Boolean!, userId: String!): UserAchievement!
 

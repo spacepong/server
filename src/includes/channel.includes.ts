@@ -2,6 +2,7 @@ import { userIncludes } from './user.includes';
 import { kickIncludes } from './kick.includes';
 import { banIncludes } from './ban.includes';
 import { muteIncludes } from './mute.includes';
+import { messageIncludes } from './message.includes';
 
 /**
  * Channel includes for fetching channel entities.
@@ -17,6 +18,8 @@ import { muteIncludes } from './mute.includes';
  * @property {object} bans.include - The ban includes for the bans.
  * @property {object} mutes - The mutes of the channel.
  * @property {object} mutes.include - The mute includes for the mutes.
+ * @property {object} messages - The messages of the channel.
+ * @property {object} messages.include - The message includes for the messages.
  */
 export const channelIncludes: object = {
   users: {
@@ -30,5 +33,8 @@ export const channelIncludes: object = {
   },
   mutes: {
     include: muteIncludes,
+  },
+  messages: {
+    include: messageIncludes,
   },
 };

@@ -103,6 +103,8 @@ export class AuthController {
     });
 
     // Redirect the user to the frontend
-    res.redirect(this.configService.get<string>('FRONTEND_URL'));
+    res.json({
+      accessToken: response.accessToken,
+    });
   }
 }
