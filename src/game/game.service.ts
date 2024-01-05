@@ -1,12 +1,15 @@
 import { clearTimeout } from 'timers';
-import {ball , Player, arena} from './gameObjects';
-import { Vector3, customRand } from './math'
-import { Socket, Server } from 'socket.io';
+import {ball , Player, arena} from './utils/gameObjects';
+import { Vector3, customRand } from './utils/math'
+import { Server } from 'socket.io';
+import { Injectable } from '@nestjs/common';
+import { MatchService } from 'src/match/match.service';
 /**
  * Represents a game.
  * @class
  */
-export class Game {
+@Injectable()
+export class GameService {
 
     public playerL: Player;
     public playerR: Player;
@@ -15,6 +18,7 @@ export class Game {
     public interval: any;
     public io: Server;
     public id: string;
+    private isFinished: boolean = false;
 
     /**
      * Creates a new Game instance.
@@ -27,14 +31,16 @@ export class Game {
      * @throws {Error} Invalid number of players.
      */
 
-    constructor(players: Player[], ball: ball, arena: arena, io: Server, id: string) {
+    constructor(
+        private readonly matchService: MatchService,
+        players: Player[], ball: ball, arena: arena, io: Server, id: string) {
 
         if (players.length != 2)
             throw new Error('invalid number of players');
         this.io = io;
         this.id = id;
-        this.playerL = players[0]; // left player
-        this.playerR = players[1]; // right player
+        this.playerL = players[0];
+        this.playerR = players[1]; 
         this.ball = ball;
         this.arena = arena;
 
@@ -148,7 +154,7 @@ export class Game {
 
         this.timeOutId = setTimeout(() => {
             this.gameLoop();
-        }, 3000);
+        }, 5000);
     }
 
     /**
@@ -178,15 +184,33 @@ export class Game {
     /**
     * finishes the game.
     */
-    finish() {
+    async finish() {
+
+        if (this.isFinished)
+            return;
+        let winnerId: string;
+        let loserId: string
         if (this.playerL.isWinner) {
             this.playerL.win();
+            winnerId = this.playerL.playerId
             this.playerR.lose();
+            loserId = this.playerR.playerId;
         }
         else {
             this.playerR.win();
+            winnerId = this.playerR.playerId;
             this.playerL.lose();
+            loserId = this.playerL.playerId;
         }
+        this.isFinished = true;
+        const newMatchInput = {
+            score: [this.playerL.Score, this.playerR.Score],
+            winnerId,
+            loserId,
+        };
+
+        await this.matchService.createMatch(newMatchInput);
+        console.log(`game finished with ${this.playerL.Score} - ${this.playerR.Score}`);
         this.dispose();
         console.log('game finished');
     }
@@ -194,12 +218,16 @@ export class Game {
     public forfeit(playerSocketId: string) {
 
         clearInterval(this.interval);
-
+        console.log(`player ${playerSocketId} forfeited`);
         if (this.playerL.socket.id == playerSocketId) {
             this.playerL.FF();
+            this.playerL.Score = 0;
+            this.playerR.Score = 5;
         }
         else if (this.playerR.socket.id == playerSocketId){
             this.playerR.FF();
+            this.playerR.Score = 0;
+            this.playerL.Score = 5;
         }
         this.finish();
     }
@@ -216,164 +244,4 @@ export class Game {
 
 
 
-}
-
-export type playerInfo = {
-    playerSocket: any,
-    isReady: boolean,
-    inGame: boolean
-}
-
-export type sideSet = {
-    side: string,
-    pos: Vector3
-}
-
-/**
- * Represents a lobby.
- */
-export class lobby {
-    public id: string;
-    public io: Server;
-    public players: Map<playerInfo, Player | null>;
-    public ball: ball;
-    public arena: arena;
-    public game: Game | null;
-    public sides: sideSet[];
-    public confiramtions: number;
-
-    /**
-     * Creates a new lobby instance.
-     * @constructor
-     * @param {string} id - The id of the lobby.
-     * @param {Server} io - The socketIo server instance.
-     */
-
-    constructor(id: string, io: any) {
-        this.id = id;
-        this.io = io;
-        this.players = new Map();
-        this.ball = new ball();
-        this.arena = new arena();
-        this.game = null;
-        this.sides = [
-            { side: 'left', pos: new Vector3((this.arena.width / -2), 0, 0) },
-            { side: 'right', pos: new Vector3((this.arena.width / 2), 0, 0) }
-        ];
-        this.confiramtions = 0;
-    }
-
-    /**
-     * adds a player to the lobby.
-     * @param {Socket} clientToAdd - The socket of the player to add.
-     * @throws {Error} Lobby is full.
-     */
-
-    public addPlayer(clientToAdd: Socket) {
-        if (this.players.size == 2)
-            throw new Error('lobby is full');
-
-        this.players.set({ playerSocket: clientToAdd, isReady: false , inGame: false}, null);
-
-        clientToAdd.on('playerReady', (socketID: string) => {
-            this.setReady(socketID);
-        });
-
-        console.log(`player added to lobby: ${this.id} as ${clientToAdd.id}`);
-        if (this.players.size == 2)
-            this.setupGame();
-    }
-
-    /**
-     * sets up the game.
-     */
-    public setupGame() {
-        // loop  over players and set their side
-        if (this.game != null)
-            return;
-        console.log('setting up game');
-
-        let i: number = 0;
-
-        this.ball.mountSocket(this.io, this.id);
-
-        this.players.forEach((player, key) => {
-            let newPlayer: Player = new Player(this.sides[i].pos, this.sides[i]);
-            newPlayer.mountSocket(key.playerSocket, this.id);
-            this.players.set(key, newPlayer);
-            key.playerSocket.join(this.id);
-            key.inGame = true;
-            i++;
-        });
-
-        let playerArr: Player[] | any = [...this.players.values()];
-
-        this.game = new Game(playerArr, this.ball, this.arena, this.io, this.id);
-
-        this.io.to(this.id).emit('startGame');
-        this.game.start();
-
-    }
-
-    /**
-     * sets a player as ready.
-     * @param {string} playerSocketIdToSet - The socket id of the player to set.
-     */
-    public setReady(playerSocketIdToSet: string) {
-        console.log(`confirmaion from ${playerSocketIdToSet}`)
-        this.players.forEach((value, key) => {
-            if (key.playerSocket && key.playerSocket.id == playerSocketIdToSet) {
-                key.isReady = true;
-                this.confiramtions++;
-            }
-        });
-
-        // check if all players are ready
-        if (this.confiramtions === 2) {
-            console.log('confirmed - starting game ')
-            this.setupGame();
-        }
-
-    }
-
-
-    public dispose() {
-        this.players.forEach((value, key) => {
-            if (key.playerSocket) {
-                key.playerSocket.leave(this.id);
-            }
-        });
-        this.players.clear();
-        if (this.game)
-            this.game.dispose();
-        this.game = null;
-        delete this.sides;
-        delete this.ball;
-        delete this.arena;
-    }
-
-    /**
-     * removes a player from the lobby.
-     * @param {Socket} clientToRemove - The socket of the player to remove.
-     */
-    public removePlayer(clientToRemove: Socket) {
-
-        this.players.forEach((value, key) => {
-            if (key.playerSocket && key.playerSocket.id == clientToRemove.id) {
-
-                    // remove player from game and finish game
-                    this.game.forfeit(clientToRemove.id);
-                    clientToRemove.offAny();
-                    this.game.dispose();
-                    delete this.game;
-                    this.game = null
-            }
-        });
-
-    }
-}
-
-export default{
-    Game,
-    lobby
 }

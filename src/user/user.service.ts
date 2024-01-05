@@ -172,24 +172,6 @@ export class UserService {
     }
   }
 
-  updateRank(userId: string, rankChange: number): Promise<User> {
-    try {
-      return this.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          rank: {
-            increment: rankChange,
-          },
-        },
-        include: userIncludes,
-      });
-    } catch (e) {
-      throw new ForbiddenException('Unable to update rank');
-    }
-  }
-
   /**
    * Deletes a user and their associated data.
    *

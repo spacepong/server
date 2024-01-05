@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Match } from './entities/match.entity';
-import { UserService } from 'src/user/user.service';
 import { NewMatchInput } from './dto/new-match.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { matchIncludes } from 'src/includes/match.includes';
@@ -20,10 +19,7 @@ export class MatchService {
    *
    * @param {PrismaService} prisma - The Prisma service for database interactions.
    */
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Creates a new match.
@@ -32,9 +28,6 @@ export class MatchService {
    * @returns {Promise<Match>} The created match.
    */
   async createMatch(newMatchInput: NewMatchInput): Promise<Match> {
-    await this.userService.updateRank(newMatchInput.winnerId, +25);
-    await this.userService.updateRank(newMatchInput.loserId, -25);
-
     return this.prisma.match.create({
       data: {
         score: newMatchInput.score,
