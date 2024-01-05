@@ -204,7 +204,7 @@ export class GameService {
         }
         this.isFinished = true;
         const newMatchInput = {
-            score: [this.playerL.Score, this.playerR.Score],
+            score: [this.playerR.Score, this.playerL.Score],
             winnerId,
             loserId,
         };
