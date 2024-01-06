@@ -137,14 +137,14 @@ export class game
       }
 
       //stages according to scores
-      if(this.p1Score >= 3)
+      if(this.p1Score >= 5)
       {
           this.stage = 2;
           this.writeScore();
           this.isGameFinished = true;
           clearInterval(this.iId);
       }
-      if(this.p2Score >= 3)
+      if(this.p2Score >= 5)
       {
           this.stage = 3;
           this.writeScore();
@@ -217,7 +217,7 @@ export class game
     let loser;
     let winner;
     if(client.id == this.player1.id){
-        this.p2Score = 3;
+        this.p2Score = 5;
         this.p1Score = 0;
         this.stage = 3;
         loser = this.player1;
@@ -225,7 +225,7 @@ export class game
     }
     else if (client.id == this.player2.id)
     {
-        this.p1Score = 3;
+        this.p1Score = 5;
         this.p2Score = 0;
         this.stage = 2;
         loser = this.player2;
