@@ -414,7 +414,7 @@ export class SocketGateway
   public handleQueueUp(@ConnectedSocket() client: Socket): void {
     console.log(`${client.id} is queueing up`);
     this.queue.set(client.id, client);
-
+    console.log(this.queue.size)
     if (this.queue.size >= 2) {
         console.log(`queue is full with ${this.queue.size} players`);
         let gameId: string = uuidv4();
