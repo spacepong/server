@@ -449,7 +449,7 @@ export class SocketGateway
   }
   else {
       console.log('creating new lobby');
-      let newLobby: lobby = new lobby(this.matchService,lobbyId, this.server);
+      let newLobby: lobby = new lobby(this.matchService,this.socketService,lobbyId, this.server);
       this.lobbies.set(lobbyId, newLobby);
       this.playersLobby.set(client.id, newLobby);
       newLobby.addPlayer(client);
@@ -480,17 +480,27 @@ export class SocketGateway
   
   @SubscribeMessage('sendInvite')
   public  handleSendInvite(@MessageBody() body: any, @ConnectedSocket() client: Socket): void {
+    console.log("1-------sendInvite------------1");
+    console.log(body);
+    console.log("2--------endSentInvite------------2");
     this.invitationService.addInvite(client, body);
     this.invitationService.notify(this.server, client);
   }
 
   @SubscribeMessage('acceptInvite')
   public handleAcceptInvite(@MessageBody() body: any, @ConnectedSocket() client: Socket): void {
+    console.log("1-------acceptInvite------------1");
+    console.log(body)
+    console.log("2-------acceptInvite------------2");
+
     this.invitationService.acceptInvite(this.server, client, body);
   }
-
+  
   @SubscribeMessage('confirmInvite')
   public handleConfirmInvite(@MessageBody() body: any, @ConnectedSocket() client: Socket): void {
+    console.log("1-------confirmaccept------------1");
+    console.log(body)
+    console.log("2-------confirmaccept------------2");
     this.invitationService.confirmInvite(this.server, client, body);
   }
 }
