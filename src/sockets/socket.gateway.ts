@@ -58,6 +58,7 @@ export class SocketGateway
    * 2d queue system
    */
   private playerQueue: any[] = [];
+  private currUserIds: any[] = [];
 
   private onlineUsers = new Set<string>();
 
@@ -415,10 +416,14 @@ export class SocketGateway
   }
   @SubscribeMessage('queueUp')
   public handleQueueUp(@ConnectedSocket() client: Socket): void {
+    if (!this.currUserIds.includes(this.socketService.getUserId(client.id)))
+      this.currUserIds.push(this.socketService.getUserId(client.id));
     console.log(`${client.id} is queueing up`);
     this.queue.set(client.id, client);
     console.log(this.queue.size)
-    if (this.queue.size >= 2) {
+    if (this.queue.size >= 2 && this.currUserIds.length >= 2) {
+        this.currUserIds.pop();
+        this.currUserIds.pop();
         console.log(`queue is full with ${this.queue.size} players`);
         let gameId: string = uuidv4();
         console.log(`creating new game with id ${gameId}`);
@@ -452,11 +457,15 @@ export class SocketGateway
   }
   @SubscribeMessage('joinQueue')
   handleJoinQueue(@ConnectedSocket() client: Socket, @MessageBody() body:any): void {
+      if (!this.currUserIds.includes(this.socketService.getUserId(client.id)))
+        this.currUserIds.push(this.socketService.getUserId(client.id));
       if (!this.playerQueue.includes(client))
           this.playerQueue.push(client);
-      if (this.playerQueue.length >= 2) {
+      if (this.playerQueue.length >= 2 && this.currUserIds.length >= 2) {
           let player1 = this.playerQueue.pop();
           let player2 = this.playerQueue.pop();
+          this.currUserIds.pop();
+          this.currUserIds.pop();
           let room = uuidv4();
           player1.join(room);
           player2.join(room);
