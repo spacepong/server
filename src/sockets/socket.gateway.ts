@@ -477,6 +477,7 @@ export class SocketGateway
           }
       }
   }
+  
   @SubscribeMessage('sendInvite')
   public  handleSendInvite(@MessageBody() body: any, @ConnectedSocket() client: Socket): void {
     this.invitationService.addInvite(client, body);

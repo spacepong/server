@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InviteDictionary } from "./types/Invitation";
 import { Socket, Server } from 'socket.io';
-import {V4  as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { SocketUser } from './types/socket-user';
 import { SocketService } from './socket.service';
 
@@ -12,10 +12,12 @@ export class InvitationService {
         ) {}
 
     private gameInvites: InviteDictionary[] = [];
-
+    
     addInvite(client: Socket , body: any): InviteDictionary {
+        console.log(client.id);
+        console.log(body.invited.userId);
         let inviteInfo: InviteDictionary = {
-            gameId: uuidv4(),
+            gameId: uuidv4(), // Use uuidv4 here
             inviter: {
                 userId: this.socketService.getUserId(client.id),
                 socketId: this.socketService.getUserSocketIds(this.socketService.getUserId(client.id))[0],
