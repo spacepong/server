@@ -26,7 +26,7 @@ export class UserResolver {
   constructor(
     private readonly userService: UserService,
     private readonly userRelationsService: UserRelationsService,
-  ) {}
+  ) { }
 
   /**
    * Query to fetch all users.
@@ -116,7 +116,28 @@ export class UserResolver {
       throw new ForbiddenException('User not authorized');
     return this.userService.updateAvatar(userId, avatar);
   }
-
+  /**
+     * Mutation to update the rank of a user.
+     *
+     * @param {string} id - The ID of the user making the request.
+     * @param {string} userId - The ID of the user.
+     * @param {number} rank - The new rank of the user.
+     * @returns {Promise<User>} The updated user entity.
+     * @throws {ForbiddenException} If the rank cannot be updated.
+     */
+  @Mutation(() => User, {
+    name: 'updateRank',
+    description: 'Updates the rank of a user',
+  })
+  updateRank(
+    @CurrentUserId() id: string,
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('rank', { type: () => Number }) rank: number,
+  ): Promise<User> {
+    if (id !== userId && !DEBUG)
+      throw new ForbiddenException('User not authorized');
+    return this.userService.updateRank(userId, rank);
+  }
   /**
    * Mutation to delete a user.
    *

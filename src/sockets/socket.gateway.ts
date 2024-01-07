@@ -12,7 +12,7 @@ import {
 } from '@nestjs/websockets';
 
 import { Server, Socket } from 'socket.io';
-
+import { v4 as uuidv4 } from 'uuid';
 import {
   SocketIOMiddleware,
   WebsocketMiddleware,
@@ -25,11 +25,13 @@ import {
 } from 'src/auth/guards/websocket.guard';
 import { Channel } from 'src/channel/entities/channel.entity';
 import { isEmpty } from 'src/utils/is-empty';
-import { v4 as uuidv4 } from 'uuid';
 import { lobbyService as lobby } from 'src/game/lobby.service';
 import { InvitationService } from './Invitation.service';
 import { MatchService } from 'src/match/match.service';
 import { game } from 'src/game2d/utils/game';
+import { Message } from 'src/message/entities/message.entity';
+
+
 
 @WebSocketGateway({ cors: true })
 @UseGuards(WebsocketGuard)
@@ -39,16 +41,15 @@ export class SocketGateway
   /**
    * Map of lobbies, key is lobbyId
    */
-  private lobbies: Map<string,lobby> = new Map<string, lobby>();
+  private lobbies: Map<string, lobby> = new Map<string, lobby>();
   /**
    * Map of clients waiting to be matched, key is client id
    */
-  private queue: Map<string,Socket> = new Map<string, Socket>();
-
+  private queue: Map<string, Socket> = new Map<string, Socket>();
   /**
    * Map of players in lobby, key is client id
    */
-  private playersLobby: Map<string,lobby> = new Map<string, lobby>();
+  private playersLobby: Map<string, lobby> = new Map<string, lobby>(); 
   /**
    * Map of 2dgames, key is player socket id
    */
@@ -57,6 +58,8 @@ export class SocketGateway
    * 2d queue system
    */
   private playerQueue: any[] = [];
+
+  private onlineUsers = new Set<string>();
 
   constructor(
     private readonly socketService: SocketService,
@@ -75,13 +78,14 @@ export class SocketGateway
 
     // remove from queue
     if (this.queue.delete(client.id)) {
-        // cleanup client
-        client.offAny();
-        client._cleanup();
-        client.removeAllListeners();
-        // distroy socket
-        client.disconnect(true);
-    } 
+      console.log(`removing ${client.id} from queue`);
+      // cleanup client
+      client.offAny();
+      client._cleanup();
+      client.removeAllListeners();
+      // distroy socket
+      client.disconnect(true);
+    }
     // remove from lobby
     else {
       if (this.playersLobby.has(client.id)) {
@@ -126,6 +130,8 @@ export class SocketGateway
     );
     if (!userId) return;
     this.server.emit('users', this.socketService.getUserIds());
+    this.onlineUsers.add(userId);
+    this.server.emit('onlineUsers', Array.from(this.onlineUsers));
 
     this.channelService
       .getChannelsByUserId(userId)
@@ -142,6 +148,8 @@ export class SocketGateway
     this.removeFromGame(client);
     this.disconnectGame(client);
     this.server.emit('users', this.socketService.getUserIds());
+    this.onlineUsers.delete(userId);
+    this.server.emit('onlineUsers', Array.from(this.onlineUsers));
 
     this.channelService
       .getChannelsByUserId(userId)
@@ -155,7 +163,7 @@ export class SocketGateway
   @SubscribeMessage('message')
   public handleMessage(
     client: Socket,
-    payload: { roomId: string; message: string },
+    payload: { roomId: string; message: Message },
   ): WsResponse<void> {
     const userId: string = this.socketService.getUserId(client.id);
     if (!userId) return;
@@ -172,12 +180,7 @@ export class SocketGateway
       client.emit('error', {
         message: 'You are not in this channel',
       });
-    else
-      this.server.to(payload.roomId).emit('message', {
-        userId,
-        roomId: payload.roomId,
-        message: payload.message,
-      });
+    else this.server.to(payload.roomId).emit('message', payload.message);
   }
 
   @SubscribeMessage('typing')
@@ -428,12 +431,14 @@ export class SocketGateway
   }
 
   @SubscribeMessage('joinLobby')
-  public handleJoinGame3d(@MessageBody() lobbyId: string, @ConnectedSocket() client: Socket): void {
+  public handleJoinGame3d(
+    @MessageBody() lobbyId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
     if (this.lobbies.has(lobbyId)) {
       console.log(`${client.id} is joining existing lobby: ${lobbyId}`);
       const lobby = this.lobbies.get(lobbyId);
-      if (lobby == undefined)
-          return;
+      if (lobby == undefined) return;
       this.playersLobby.set(client.id, lobby);
       lobby.addPlayer(client);
   }
