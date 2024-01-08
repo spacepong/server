@@ -4,6 +4,8 @@ import { Socket, Server } from 'socket.io';
 import { GameService as Game } from './game.service';
 import { Injectable } from '@nestjs/common';
 import { MatchService } from 'src/match/match.service';
+import { SocketService } from 'src/sockets/socket.service';
+
 export type playerInfo = {
     playerSocket: any,
     isReady: boolean,
@@ -31,7 +33,7 @@ export class lobbyService{
     public isOn: boolean = false;
     public isDisposed: boolean = false;
     private matchService: MatchService;
-
+    private socketService: SocketService;
     /**
      * Creates a new lobby instance.
      * @constructor
@@ -39,8 +41,9 @@ export class lobbyService{
      * @param {Server} io - The socketIo server instance.
      */
 
-    constructor(matchService: MatchService,id: string, io: any) {
+    constructor(matchService: MatchService,socketService: SocketService,id: string, io: any) {
         this.matchService = matchService;
+        this.socketService = socketService;
         this.id = id;
         this.io = io;
         this.players = new Map();
@@ -99,7 +102,7 @@ export class lobbyService{
 
         let playerArr: Player[] | any = [...this.players.values()];
 
-        this.game = new Game(this.matchService,playerArr, this.ball, this.arena, this.io, this.id);
+        this.game = new Game(this.matchService,this.socketService,playerArr, this.ball, this.arena, this.io, this.id);
 
         this.io.to(this.id).emit('startGame');
         this.game.start();

@@ -4,6 +4,8 @@ import { Vector3, customRand } from './utils/math'
 import { Server } from 'socket.io';
 import { Injectable } from '@nestjs/common';
 import { MatchService } from 'src/match/match.service';
+import { SocketService } from 'src/sockets/socket.service';
+
 /**
  * Represents a game.
  * @class
@@ -33,6 +35,7 @@ export class GameService {
 
     constructor(
         private readonly matchService: MatchService,
+        private readonly socketService: SocketService,
         players: Player[], ball: ball, arena: arena, io: Server, id: string) {
 
         if (players.length != 2)
@@ -143,6 +146,11 @@ export class GameService {
         
         this.playerL.echoPos();
         this.playerR.echoPos();
+
+        let playerLMainSocket = this.socketService.getUserSocketIds(this.playerL.playerId)[0];
+        let playerRMainSocket = this.socketService.getUserSocketIds(this.playerR.playerId)[0];
+        this.io.to(playerLMainSocket).emit("playerInGame");
+        this.io.to(playerRMainSocket).emit("playerInGame");
 
         this.playerL.emitPOS();
         this.playerR.emitPOS();
