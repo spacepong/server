@@ -30,6 +30,7 @@ import { InvitationService } from './Invitation.service';
 import { MatchService } from 'src/match/match.service';
 import { game } from 'src/game2d/utils/game';
 import { Message } from 'src/message/entities/message.entity';
+import { emit } from 'process';
 
 
 
@@ -470,7 +471,8 @@ export class SocketGateway
           player1.join(room);
           player2.join(room);
           if (player1 && player2) {
-              let newGame = new game(this.matchService,room, this.server, player1, player2, body);
+            // client.to(this.socketService.getUserId(client.id)).emit('inGame');
+              let newGame = new game(this.matchService,this.socketService, room, this.server, player1, player2, body);
               this.currGame.set(player1.id, newGame);
               this.currGame.set(player2.id, newGame);
               newGame.startGame();

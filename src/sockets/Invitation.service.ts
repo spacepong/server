@@ -14,7 +14,6 @@ export class InvitationService {
     private gameInvites: InviteDictionary[] = [];
     
     addInvite(client: Socket , body: any): InviteDictionary {
-        console.log(`ADD: ${client.id} aka ${this.socketService.getUserSocketIds(this.socketService.getUserId(client.id))[0]} sent an invite to ${body.invited.userId} aka ${this.socketService.getUserSocketIds(body.invited.userId)[0]}`);
         let inviteInfo: InviteDictionary = {
             gameId: uuidv4(), // Use uuidv4 here
             inviter: {
@@ -35,8 +34,8 @@ export class InvitationService {
     }
 
     getInviteInfoBySocketId(socketId: string): InviteDictionary {
-        let mainSocket =  this.socketService.getUserSocketIds(this.socketService.getUserId(socketId))[0]
-        return this.gameInvites.find((invite: InviteDictionary) => invite.inviter.socketId == mainSocket || invite.invited.socketId == mainSocket);
+        let mainSocket =  this.socketService.getUserSocketIds(this.socketService.getUserId(socketId));
+        return this.gameInvites.find((invite: InviteDictionary) => mainSocket.includes(invite.inviter.socketId) || mainSocket.includes(invite.invited.socketId));
     }
     
     notify(io: Server, inviter: Socket){
@@ -44,9 +43,13 @@ export class InvitationService {
         let inviteInfo: InviteDictionary = this.getInviteInfoBySocketId(inviter.id);
         console.log("****2")
         console.log(inviteInfo);
-        console.log("****1")
-        io.to(inviteInfo.invited.socketId).emit('receiveInvite');
-        console.log(`........................... notfying: ${inviteInfo.invited.socketId}`)
+        console.log("****1");
+        let invitedSockets = this.socketService.getUserSocketIds(inviteInfo.invited.userId)
+        
+        invitedSockets.forEach(socketId => {
+            io.to(socketId).emit('receiveInvite');
+
+        });
     }
 
     acceptInvite(io: Server , Invited: Socket, body: any): InviteDictionary {
@@ -56,11 +59,17 @@ export class InvitationService {
         console.log("^^^^^^^^^^^^^^^^^^^^")
         if (body.option == 'accept'){
             inviteInfo.invited.accepted = true;
-            io.to(inviteInfo.inviter.socketId).emit('inviteAccepted');
+            let inviterSockets = this.socketService.getUserSocketIds(inviteInfo.inviter.userId);
+            inviterSockets.forEach(socketId=>{
+                io.to(socketId).emit('inviteAccepted');
+            })
         }
         else if (body.option == 'reject'){
             inviteInfo.invited.accepted = false;
-            io.to(inviteInfo.inviter.socketId).emit('inviteRejected');
+            let inviterSockets = this.socketService.getUserSocketIds(inviteInfo.inviter.userId);
+            inviterSockets.forEach(socketId=>{
+                io.to(socketId).emit('inviteRejected');
+            });
             this.gameInvites = this.gameInvites.filter((invite: InviteDictionary) => invite !== inviteInfo);
         }
         return inviteInfo;
@@ -72,15 +81,23 @@ export class InvitationService {
         if (body.option == 'accept'){
             inviteInfo.inviter.accepted = true;
             if (inviteInfo.invited.accepted){
-                io.to(inviteInfo.invited.socketId).emit('inviteConfirmed', inviteInfo);
-                io.to(inviteInfo.inviter.socketId).emit('inviteConfirmed', inviteInfo);
+                let invitedSockets = this.socketService.getUserSocketIds(inviteInfo.invited.userId);
+                let inviterSockets = this.socketService.getUserSocketIds(inviteInfo.inviter.userId);
+                invitedSockets.forEach(socketId=>{
+                    io.to(socketId).emit('inviteConfirmed', inviteInfo);
+                });
+                inviterSockets.forEach(socketId=>{
+                    io.to(socketId).emit('inviteConfirmed', inviteInfo);
+                })
                 this.gameInvites = this.gameInvites.filter((invite: InviteDictionary) => invite !== inviteInfo);
             }
                 
         }
         else if (body.option == 'reject'){
             inviteInfo.inviter.accepted = false;
-            io.to(inviteInfo.invited.socketId).emit('inviteRejected');
+            let invitedSockets = this.socketService.getUserSocketIds(inviteInfo.invited.userId);
+            invitedSockets.forEach(socketId=>{
+            io.to(socketId).emit('inviteRejected')});
             this.gameInvites = this.gameInvites.filter((invite: InviteDictionary) => invite !== inviteInfo);
         }
         return inviteInfo;

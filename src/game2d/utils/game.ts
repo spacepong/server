@@ -1,8 +1,11 @@
 import { NewMatchInput } from './../../match/dto/new-match.input';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
+import { Injectable } from '@nestjs/common';
 import { MatchService } from 'src/match/match.service';
+import { SocketService } from 'src/sockets/socket.service';
 
+@Injectable()
 export class game
 {
     server: Server;
@@ -38,9 +41,12 @@ export class game
   //room
   public room: string;
   public isGameFinished: boolean = false;
+    public player1Id :string;
+    public player2Id :string;
 
   constructor(
     private readonly matchService: MatchService,
+    private readonly socketService: SocketService,
     room: string, server: Server, p1: Socket, p2 : Socket, data: { width: number, height: number }) {
     console.log(`game created with id ${room}`);
     this.pheight = data.height;
@@ -55,6 +61,8 @@ export class game
     this.p2Score = 0;
     this.room = room;
     this.server = server;
+    this.player1Id = p1.handshake.query.userId as string;
+    this.player2Id = p2.handshake.query.userId as string;
     this.server.to(this.room).emit("startGame",{
         gamer1: {
             id: p1.id,
@@ -72,6 +80,16 @@ export class game
 
   startGame()
   {
+    let playerLMainSocket = this.socketService.getUserSocketIds(this.player1Id);
+    let playerRMainSocket = this.socketService.getUserSocketIds(this.player2Id);
+    playerLMainSocket.forEach(socketId=>{
+
+        this.server.to(socketId).emit("playerInGame",this.player1Id);
+    });
+    playerRMainSocket.forEach(socketId=>{
+
+        this.server.to(socketId).emit("playerInGame",this.player2Id);
+    })
     console.log(`game ${this.room}: started`);
     this.handleBallUpdates();
     this.player1.on('moveP1Up',(data)=>{
@@ -212,6 +230,18 @@ export class game
 
   endGame(client: Socket) 
   {
+    let playerLMainSocket = this.socketService.getUserSocketIds(this.player1Id);
+    let playerRMainSocket = this.socketService.getUserSocketIds(this.player2Id);
+
+    playerLMainSocket.forEach(socketId =>{
+
+        this.server.to(socketId).emit("playerOffGame",this.player1Id);
+    })
+
+    playerRMainSocket.forEach(socketId =>{
+
+        this.server.to(socketId).emit("playerOffGame",this.player2Id);
+    })
     if(this.isGameFinished == true)
         return ;
     let loser;

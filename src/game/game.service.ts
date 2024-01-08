@@ -147,10 +147,15 @@ export class GameService {
         this.playerL.echoPos();
         this.playerR.echoPos();
 
-        let playerLMainSocket = this.socketService.getUserSocketIds(this.playerL.playerId)[0];
-        let playerRMainSocket = this.socketService.getUserSocketIds(this.playerR.playerId)[0];
-        this.io.to(playerLMainSocket).emit("playerInGame");
-        this.io.to(playerRMainSocket).emit("playerInGame");
+        let playerLMainSockets = this.socketService.getUserSocketIds(this.playerL.playerId);
+        let playerRMainSockets = this.socketService.getUserSocketIds(this.playerR.playerId);
+        playerLMainSockets.forEach(socketId=>{
+
+            this.io.to(socketId).emit("playerInGame",this.playerL.playerId);
+        })
+        playerRMainSockets.forEach(socketId=>{
+            this.io.to(socketId).emit("playerInGame",this.playerR.playerId);
+        })
 
         this.playerL.emitPOS();
         this.playerR.emitPOS();
@@ -245,6 +250,17 @@ export class GameService {
             clearTimeout(this.timeOutId);
         if (this.interval)
             clearInterval(this.interval);
+        let playerLMainSocket = this.socketService.getUserSocketIds(this.playerL.playerId);
+        let playerRMainSocket = this.socketService.getUserSocketIds(this.playerR.playerId);
+        playerLMainSocket?.forEach(socketId => {
+
+            this.io.to(socketId).emit("playerOffGame",this.playerL.playerId);
+        });
+
+        playerRMainSocket?.forEach(socketId => {
+
+            this.io.to(socketId).emit("playerOffGame",this.playerR.playerId);
+        });
         this.playerL.dispose();
         this.playerR.dispose();
         this.ball.dispose();
